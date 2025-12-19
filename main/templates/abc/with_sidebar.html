@@ -1,0 +1,69 @@
+{% extends "abc/base.html" %}
+{% block rawcontent %}
+<body class="d-flex justify-content-space-between flex-row">
+    <div id="sidebar-spacer" class="w-15 h-100 d-flex" style="min-width: 280px; width: 15%;">
+        <div id="sidebar-container" class="w-15 position-fixed start-0 h-100 sidebar-container d-flex" style="width: 15%;">
+            {% block sidebar-override %}
+            <div class="d-flex flex-column flex-shrink-0 p-3 bg-body-tertiary start-0 top-0 w-100" id="sidebar" style="min-width: 280px;">
+                <h2>Simple Votings</h2>
+                <hr>
+                <ul class="nav nav-pills flex-column mb-auto">
+                    <li class="nav-item">
+                        <a href="/" class="nav-link link-body-emphasis">
+                            <i class="bi bi-activity"></i>
+                            Dashboard
+                        </a>
+                    </li>
+                </ul>
+                <hr>
+                <div>
+                    <ul class="nav nav-pills flex-column mb-auto">
+                        {% if logged_in %}
+                        <li class="nav-item">
+                            <a href="/account/settings" class="nav-link link-body-emphasis">
+                                <i class="bi bi-gear-fill"></i>
+                                Settings
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/account/sessions" class="nav-link link-body-emphasis">
+                                <i class="bi bi-laptop-fill"></i>
+                                Sessions
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/logout" class="nav-link text-danger">
+                                <i class="bi bi-box-arrow-right"></i>
+                                Log out
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="nav-item">
+                            <a href="/login" class="nav-link link-body-emphasis">
+                                <i class="bi bi-box-arrow-in-right"></i>
+                                Log in
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+            {% endblock %}
+            <script>
+                let sidebar = document.getElementById("sidebar");
+                let sidebar_items = sidebar.querySelectorAll("a.nav-link");
+                sidebar_items.forEach(sidebar_item => {
+                    if(window.location.pathname == sidebar_item.pathname){
+                        sidebar_item.classList.add("active","pe-none");
+                        sidebar_item.classList.remove("link-body-emphasis");
+                    }
+                });
+            </script>
+        </div>
+    </div>
+    <div class="w-85 mw-100 ms-3 d-flex flex-column end-0 overflow-y-scroll object-fit-fill" style="min-width: 100px; width: 85%;">
+        {% block content %}
+        {% endblock %}
+    </div>
+</body>
+{% endblock %}
