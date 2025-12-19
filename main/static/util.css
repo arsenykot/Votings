@@ -1,0 +1,37 @@
+#toast-container{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1024;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: end;
+    padding-right: 1em;
+}
+
+#toast-container .toast{
+    pointer-events: all;
+}
+
+.form-control.top{
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    margin-bottom: -1px;
+}
+.form-control.middle{
+    border-radius: 0;
+    margin-top: -1px;
+    margin-bottom: -1px;
+}
+.form-control.bottom{
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    margin-top: -1px;
+}
+.form-floating:focus-within {
+    z-index: 2;
+}

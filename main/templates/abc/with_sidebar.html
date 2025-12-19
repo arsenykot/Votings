@@ -32,14 +32,14 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="/logout" class="nav-link text-danger">
+                            <a href="/api/logout" class="nav-link text-danger">
                                 <i class="bi bi-box-arrow-right"></i>
                                 Log out
                             </a>
                         </li>
                         {% else %}
                         <li class="nav-item">
-                            <a href="/login" class="nav-link link-body-emphasis">
+                            <a href="/account/login" class="nav-link link-body-emphasis">
                                 <i class="bi bi-box-arrow-in-right"></i>
                                 Log in
                             </a>
@@ -65,5 +65,8 @@
         {% block content %}
         {% endblock %}
     </div>
+    <div id="toast-container">
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 {% endblock %}

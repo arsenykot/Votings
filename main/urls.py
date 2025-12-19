@@ -5,5 +5,6 @@ from main.views import *
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include("main.api.urls")),
-    path('', index_page_view)
+    path('', index_page_view),
+    path('account/login', login_page_view)
 ]
