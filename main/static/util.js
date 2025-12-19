@@ -1,5 +1,5 @@
 //#region htmlutils
-function spawnToast(color, icon, content, closeButton = true, container = null){
+function spawnToast(color, icon, content, closeButton = false, container = null){
     let toastElement = document.createElement("div");
     toastElement.classList.add("toast", "align-items-center", "text-bg-"+color, "border-0", "mb-2", "mt-2", "mr-2");
 

@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="utf-8"?>
+<docs xmlns="." xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation=". DOC.XSD">
+    <path>doc</path>
+    <title>Корень документации</title>
+    <folder>
+        <path>js</path>
+        <title>Корень документации JavaScript</title>
+        <desc>Документация для функционала, реализованого в `/main/static/util.js` и доступного при использовании любого из шаблонов в `abc/`</desc>
+        <file><path>ajax</path>
+            <title>Методы AJAX</title>
+            <desc>Предоставляет методы для работы с AJAX. Функционал реализован в `/main/static/util.js` в регионе `ajax`</desc>
+            <method>
+                <name>ajaxQuery</name>
+                <desc>Осуществляет асинхронный запрос на сервер</desc>
+                <arg><name>endpoint</name>
+                    <type>String</type>
+                    <desc>Конечная точка API, на которую будет направлен запрос</desc>
+                </arg>
+                <arg><name>method</name>
+                    <type>"GET"|"POST"</type>
+                    <desc>Метод отправляемого запроса</desc>
+                </arg>
+                <arg><name>ready_callback</name>
+                    <type>Function[AJAXResponse]</type>
+                    <desc>Метод, который будет вызван по готовности запроса. Должен принимать фиктивный объект AJAXResponse, описанный в примечании</desc>
+                </arg>
+                <arg><name>data</name>
+                    <type>Object</type>
+                    <desc>Тело запроса в виде объекта</desc>
+                </arg>
+                <arg><name>error_passthrough</name>
+                    <type>Boolean</type>
+                    <desc>Указывает, попадёт ли ошибка в метод по готовности (по умолчанию - нет)</desc>
+                </arg>
+                <arg><name>httpheaders</name>
+                    <type>Array[Array[String]]</type>
+                    <desc>Массив пар типа `["ключ", "значение"]`, задающий HTTP-аргументы запроса. По умолчанию пуст</desc>
+                </arg>
+                <ret>null</ret>
+            </method>
+            <method>
+                <name>ajaxGet</name>
+                <desc>Алиас для `ajaxQuery`, где `method="GET"`</desc>
+                <ret>null</ret>
+            </method>
+            <method>
+                <name>ajaxPost</name>
+                <desc>Алиас для `ajaxQuery`, где `method="POST"`</desc>
+                <ret>null</ret>
+            </method>
+            <table><name>Примечание: Формат фиктивного объекта AJAXResponse</name>
+                <header>Поле;Тип;Описание</header>
+                <row>`status`;`Number|"error"`;HTTP-статус ответа ИЛИ "error" в случае ошибки, когда `error_passthrough` включено.</row>
+                <row>`content`;`String?`;Контент ответа на запрос (не существует при `status == "error"`)</row>
+                <row>`error`;`Object?`;Текст ошибки (не существует при `status != "error"`)</row>
+            </table>
+        </file>
+        <file><path>htmlutils</path>
+            <title>Утилиты для HTML</title>
+            <desc>Предоставляет методы-утилиты для работы с HTML. Функционал реализован в `/main/static/util.js` в регионе `htmlutils`</desc>
+            <method><name>setSpinner</name>
+                <desc>Заменяет `innerHTML` элемента на спиннер с указанным текстом.</desc>
+                <arg><name>element</name>
+                    <type>HTMLElement</type>
+                    <desc>Целевой элемент</desc>
+                </arg>
+                <arg><name>text</name>
+                    <type>String</type>
+                    <desc>Текст возле спиннера</desc>
+                </arg>
+                <arg><name>size</name>
+                    <type>"sm"|"lg"?</type>
+                    <desc>Размер спиннера. По умолчанию `sm`. См. [документацию для спиннеров](https://getbootstrap.com/docs/5.3/components/spinners/)</desc>
+                </arg>
+                <arg><name>type</name>
+                    <type>"border"|"grow"?</type>
+                    <desc>Тип анимации спиннера. По умолчанию `border`. См. [документацию для спиннеров](https://getbootstrap.com/docs/5.3/components/spinners/)</desc>
+                </arg>
+                <ret>null</ret>
+            </method>
+            <method><name>spawnToast</name>
+                <desc>Создаёт уведомление-тост с указанными параметрами</desc>
+                <arg><name>color</name>
+                    <type>String</type>
+                    <desc>Цвет уведомления-тоста. См. [Список цветов](https://getbootstrap.com/docs/5.3/customize/color/#theme-colors)</desc>
+                </arg>
+                <arg><name>icon</name>
+                    <type>String</type>
+                    <desc>Название иконки [отсюда](https://icons.getbootstrap.com/)</desc>
+                </arg>
+                <arg><name>content</name>
+                    <type>String</type>
+                    <desc>HTML-содержимое уведомления-тоста</desc>
+                </arg>
+                <arg><name>closeButton</name>
+                    <type>Boolean</type>
+                    <desc>Указывает, будет ли видна кнопка закрытия тоста. По умолчанию `false`</desc>
+                </arg>
+                <arg><name>container</name>
+                    <type>HTMLElement</type>
+                    <desc>HTML-элемент, в который требуется поместить тост. По умолчанию элемент с ID `toast-container`</desc>
+                </arg>
+                <ret>null</ret>
+            </method>
+        </file>
+    </folder>
+    <folder>
+        <path>doc</path>
+        <title>Написание документации</title>
+        <desc>Инструкция по написанию документации.</desc>
+        <folder><path>tags</path>
+            <title>Список XML-тегов</title>
+            <desc>Здесь описана XML-структура, по которой необходимо составлять файл docs.xml</desc>
+            <file><path>big</path>
+                <title>Большие метки</title>
+                <xmltag><name>docs</name>
+                    <desc>Корневой элемент документации. Модифицировать прямо дочерние параметры не рекомендуется</desc>
+                    <arg><name>path</name>
+                        <type>xs:string</type>
+                        <desc>Смещение пути, по которому расположена документация</desc>
+                    </arg>
+                    <arg><name>title</name>
+                        <type>xs:string</type>
+                        <desc>Заголовок индекса</desc>
+                    </arg>
+                    <arg><name>desc?</name>
+                        <type>xs:string</type>
+                        <desc>Описание индекса. Необязательный аргумент</desc>
+                    </arg>
+                    <arg><name>folder*?</name>
+                        <type>folder</type>
+                        <desc>Папка с документацией (необязательно, мульти-элемент)</desc>
+                    </arg>
+                </xmltag>
+                <xmltag><name>folder</name>
+                    <desc>Папка с документацией</desc>
+                    <arg><name>path</name>
+                        <type>xs:string</type>
+                        <desc>Смещение папки относительно родительского элемента (aka название папки)</desc>
+                    </arg>
+                    <arg><name>title</name>
+                        <type>xs:string</type>
+                        <desc>Заголовок индекса</desc>
+                    </arg>
+                    <arg><name>desc?</name>
+                        <type>xs:string</type>
+                        <desc>Описание этой папки с документацией (необязательно)</desc>
+                    </arg>
+                    <arg><name>file*?</name>
+                        <type>file</type>
+                        <desc>Файл документации (необязательно, мульти-элемент)</desc>
+                    </arg>
+                    <arg><name>folder*?</name>
+                        <type>xs:string</type>
+                        <desc>Подпапка с документацией (необязательно, мульти-элемент)</desc>
+                    </arg>
+                </xmltag>
+                <xmltag><name>file</name>
+                    <desc>Файл документации</desc>
+                    <arg><name>path</name>
+                        <type>xs:string</type>
+                        <desc>Название файла документации</desc>
+                    </arg>
+                    <arg><name>title</name>
+                        <type>xs:string</type>
+                        <desc>Заголовок файла</desc>
+                    </arg>
+                    <arg><name>desc?</name>
+                        <type>xs:string</type>
+                        <desc>Описание этого файла (необязательно)</desc>
+                    </arg>
+                    <arg><name>method*?</name>
+                        <type>method</type>
+                        <desc>Метод (необязательно, мульти-элемент)</desc>
+                    </arg>
+                    <arg><name>xmltag*?</name>
+                        <type>xmltag</type>
+                        <desc>XML-тег (необязательно, мульти-элемент)</desc>
+                    </arg>
+                    <arg><name>table*?</name>
+                        <type>table</type>
+                        <desc>Таблица (необязательно, мульти-элемент)</desc>
+                    </arg>
+                </xmltag>
+            </file>
+            <file><path>medium</path>
+                <title>Средние метки</title>
+                <xmltag><name>method</name>
+                    <desc>Метод</desc>
+                    <arg><name>name</name>
+                        <type>xs:string</type>
+                        <desc>Название метода</desc>
+                    </arg>
+                    <arg><name>desc</name>
+                        <type>xs:string</type>
+                        <desc>Описание метода</desc>
+                    </arg>
+                    <arg><name>arg</name>
+                        <type>arg*?</type>
+                        <desc>Агрумент (необязательно, мульти-элемент)</desc>
+                    </arg>
+                    <arg><name>ret</name>
+                        <type>xs:string</type>
+                        <desc>Тип возврата метода</desc>
+                    </arg>
+                </xmltag>
+                <xmltag><name>xmltag</name>
+                    <desc>XML-элемент</desc>
+                    <arg><name>name</name>
+                        <type>xs:string</type>
+                        <desc>Название элемента</desc>
+                    </arg>
+                    <arg><name>desc</name>
+                        <type>xs:string</type>
+                        <desc>Описание элемента</desc>
+                    </arg>
+                    <arg><name>arg</name>
+                        <type>arg*?</type>
+                        <desc>Дочерний элемент (необязательно, мульти-элемент)</desc>
+                    </arg>
+                </xmltag>
+                <xmltag><name>table</name>
+                    <desc>Таблица</desc>
+                    <arg><name>name</name>
+                        <type>xs:string</type>
+                        <desc>Название таблицы</desc>
+                    </arg>
+                    <arg><name>header</name>
+                        <type>xs:string</type>
+                        <desc>Заголовок таблицы (CSV, разделитель - `;`)</desc>
+                    </arg>
+                    <arg><name>row</name>
+                        <type>xs:string*</type>
+                        <desc>Строка в таблице (CSV, разделитель - `;`, мульти-элемент)</desc>
+                    </arg>
+                </xmltag>
+            </file>
+            <file><path>small</path>
+                <title>Мелкие метки</title>
+                <xmltag><name>arg</name>
+                    <desc>Аргумент / Атрибут</desc>
+                    <arg><name>name</name>
+                        <type>xs:string</type>
+                        <desc>Название аргумента</desc>
+                    </arg>
+                    <arg><name>type</name>
+                        <type>xs:string</type>
+                        <desc>Тип аргумента</desc>
+                    </arg>
+                    <arg><name>desc</name>
+                        <type>xs:string</type>
+                        <desc>Описание аргумента</desc>
+                    </arg>
+                </xmltag>
+            </file>
+        </folder>
+        <folder><path>tut</path>
+            <title>Руководства</title>
+            <file><path>extensions</path>
+                <title>Расширения для VS Code</title>
+                <table>
+                    <name>Рекомендуемые расширения для VS Code</name>
+                    <header>Для чего;Ссылка</header>
+                    <row>Проверка XML;[Ссылка](https://marketplace.visualstudio.com/items?itemName=redhat.vscode-xml)</row>
+                    <row>Подсветка синтаксиса Django;[Ссылка](https://marketplace.visualstudio.com/items?itemName=batisteo.vscode-django)</row>
+                    <row>Предпросмотр Markdown;[Ссылка](https://marketplace.visualstudio.com/items?itemName=shd101wyy.markdown-preview-enhanced)</row>
+                </table>
+            </file>
+            <file><path>building</path>
+                <title>Сборка документации</title>
+                <table>
+                    <name>Шаги для сборки документации</name>
+                    <header>Шаг;Описание</header>
+                    <row>1;Внесите свои правки в файл /docs.xml</row>
+                    <row>2;Удалите старую версию папки /doc/ (если файлы/папки были удалены из разметки или переименованы)</row>
+                    <row>3;Выполните docgen.py</row>
+                    <row>4;Просмотрите сгенерированные файлы</row>
+                </table>
+            </file>
+        </folder>
+    </folder>
+</docs>

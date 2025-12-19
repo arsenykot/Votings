@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema targetNamespace="." xmlns="." xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:complexType name="arg">
+    <xs:sequence>
+      <xs:element name="name" type="xs:string"/>
+      <xs:element name="type" type="xs:string"/>
+      <xs:element name="desc" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+
+
+  <xs:complexType name="method">
+    <xs:sequence>
+      <xs:element name="name" type="xs:string"/>
+      <xs:element name="desc" type="xs:string" minOccurs="0"/>
+      <xs:element name="arg" type="arg" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="ret" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="xmltag">
+    <xs:sequence>
+      <xs:element name="name" type="xs:string"/>
+      <xs:element name="desc" type="xs:string" minOccurs="0"/>
+      <xs:element name="arg" type="arg" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="table">
+    <xs:sequence>
+      <xs:element name="name" type="xs:string"/>
+      <xs:element name="header" type="xs:string"/>
+      <xs:element name="row" type="xs:string" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+
+
+  <xs:complexType name="docfile">
+    <xs:sequence>
+      <xs:element name="path" type="xs:string"/>
+      <xs:element name="title" type="xs:string"/>
+      <xs:element name="desc" type="xs:string" minOccurs="0"/>
+      <xs:element name="method" type="method" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="xmltag" type="xmltag" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="table" type="table" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="docfolder">
+    <xs:sequence>
+      <xs:element name="path" type="xs:string"/>
+      <xs:element name="title" type="xs:string"/>
+      <xs:element name="desc" type="xs:string" minOccurs="0"/>
+      <xs:element name="file" type="docfile" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="folder" type="docfolder" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+
+
+  <xs:element name="docs">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="path" type="xs:string"/>
+        <xs:element name="title" type="xs:string"/>
+        <xs:element name="desc" type="xs:string" minOccurs="0"/>
+        <xs:element name="folder" type="docfolder" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
