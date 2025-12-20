@@ -42,4 +42,6 @@ def render(request, template, context = None, content_type = None, status = None
         "logged_in" : checkUser(getSessOr(request, "username", False), getSessOr(request, "token", False)),
         "username" : getSessOr(request, "username", False)
     }
+    for k in context.keys():
+        newContext[k] = context[k]
     return raw_render(request, template, newContext, content_type, status, using)

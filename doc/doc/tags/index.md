@@ -6,6 +6,4 @@
 - [Средние метки](/doc/doc/tags/medium.md)
 - [Мелкие метки](/doc/doc/tags/small.md)
 
-_Автоматически сгенерировано DocGen из XML-файла docs.xml_
-
-_Структуру файла docs.xml см. в [/DOC.XSD](/DOC.XSD) или [здесь](/doc/doc/index.md)._
+_Автоматически сгенерировано [DocGen](/doc/doc/index.md)_

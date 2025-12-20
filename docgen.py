@@ -6,12 +6,17 @@ import os
 import json
 import csv
 import io
+#from datetime import datetime as dt
+
+print("""
+DocGen
+""")
 
 xfd = open("docs.xml", "r", encoding="utf-8")
 xmlfile = XML.ElementTree(file=xfd)
 xfd.close()
-APPENDIX = "\n\n_Автоматически сгенерировано DocGen из XML-файла docs.xml_\n\n_Структуру файла docs.xml см. в [/DOC.XSD](/DOC.XSD) или [здесь](/doc/doc/index.md)._"
-# 
+APPENDIX = "\n\n_Автоматически сгенерировано [DocGen](/doc/doc/index.md)_"
+# dt.now().strftime("%d/%m/%Y %H:%M")
 
 ROOT = xmlfile.getroot()
 
@@ -57,11 +62,14 @@ def parseDoc(element, prefix = ""):
         "desc": findTxt(element, "desc"),
         "xmltags": [],
         "methods": [],
+        "models": [],
         "tables": []
     }
     ofp = prefix+"/"+find(element, "path").text+".md"
+    print("Parsing: "+ofp)
     struct["path"] = ofp
     for elem in element:
+        print("- "+elem.tag)
         match elem.tag:
             case "{.}method":
                 mstruct = {
@@ -69,6 +77,7 @@ def parseDoc(element, prefix = ""):
                     "name": findTxt(elem, "name"),
                     "desc": findTxt(elem, "desc"),
                     "args": [],
+                    "force_args": findTxt(elem, "argsor"),
                     "ret" : findTxt(elem, "ret")
                     }
                 for arg in elem.findall("{.}arg"):
@@ -78,6 +87,20 @@ def parseDoc(element, prefix = ""):
                         "desc": findTxt(arg, "desc")
                         })
                 struct["methods"].append(mstruct)
+            case "{.}model":
+                mstruct = {
+                    "type": "model",
+                    "name": findTxt(elem, "name"),
+                    "desc": findTxt(elem, "desc"),
+                    "args": []
+                    }
+                for arg in elem.findall("{.}arg"):
+                    mstruct["args"].append({
+                        "name": findTxt(arg, "name"),
+                        "type": findTxt(arg, "type"),
+                        "desc": findTxt(arg, "desc")
+                        })
+                struct["models"].append(mstruct)
             case "{.}xmltag":
                 xstruct = {
                     "type": "xmltag",
@@ -147,7 +170,7 @@ def renderArgs(arr, header, item_fstr, item_tuple,  item_vars):
     return ofc, argnames
 
 def renderStruct(struct, parent=None):
-    print(struct["path"])
+    print("Rendering: "+struct["path"])
     links = "[Корень](/"+findTxt(ROOT,"path")+"/index.md)"
     if parent == None:
         parent = findTxt(ROOT, "path")
@@ -170,11 +193,17 @@ def renderStruct(struct, parent=None):
             ofc = "# %s\n%s\n\n%s"%(struct["title"], links, struct["desc"])
             for method in struct["methods"]:
                 cofc, argnames = renderArgs(method["args"], "Параметр;Тип;Описание", "`%s`;`%s`;%s", "(arg['name'], arg['type'], arg['desc'])", {})
+                if method["force_args"] != "":
+                    argnames = method["force_args"]
                 ofc += "\n\n### `%s(%s) -> %s`\n%s"%(method["name"], argnames, method["ret"], method["desc"]) + cofc
 
             for xmltag in struct["xmltags"]:
                 cofc, argnames = renderArgs(xmltag["args"], "Параметр;Тип;Описание", "`%s`;`%s`;%s", "(arg['name'], arg['type'], arg['desc'])", {})
                 ofc += "\n\n### `<%s>`\n%s"%(xmltag["name"], xmltag["desc"]) + cofc
+
+            for model in struct["models"]:
+                cofc, argnames = renderArgs(model["args"], "Поле;Тип;Описание", "`%s`;`%s`;%s", "(arg['name'], arg['type'], arg['desc'])", {})
+                ofc += "\n\n### `%s`\n%s"%(model["name"], model["desc"]) + cofc
 
             for table in struct["tables"]:
                 ofc += "\n\n### %s"%(table["name"])
@@ -189,9 +218,10 @@ def renderStruct(struct, parent=None):
             ofd.write(ofc)
             ofd.close()
 
-
+print("Parsing index")
 STRUCT = parseIndex(ROOT)
 
 #print(json.dumps(STRUCT, indent=2, ensure_ascii=False))
 renderStruct(STRUCT)
-
+print("Success!")
+input()

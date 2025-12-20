@@ -11,6 +11,4 @@
 |Предпросмотр Markdown      |[Ссылка](https://marketplace.visualstudio.com/items?itemName=shd101wyy.markdown-preview-enhanced)|
 
 
-_Автоматически сгенерировано DocGen из XML-файла docs.xml_
-
-_Структуру файла docs.xml см. в [/DOC.XSD](/DOC.XSD) или [здесь](/doc/doc/index.md)._
+_Автоматически сгенерировано [DocGen](/doc/doc/index.md)_

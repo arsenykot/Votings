@@ -30,6 +30,4 @@
 |`error`  |`Object?`        |Текст ошибки (не существует при `status != "error"`)                               |
 
 
-_Автоматически сгенерировано DocGen из XML-файла docs.xml_
-
-_Структуру файла docs.xml см. в [/DOC.XSD](/DOC.XSD) или [здесь](/doc/doc/index.md)._
+_Автоматически сгенерировано [DocGen](/doc/doc/index.md)_

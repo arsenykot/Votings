@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<docs xmlns="." xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation=". DOC.XSD">
+<docs xmlns="." xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation=". doc/DOC.XSD">
     <path>doc</path>
     <title>Корень документации</title>
-    <folder>
-        <path>js</path>
+    <folder><path>js</path>
         <title>Корень документации JavaScript</title>
         <desc>Документация для функционала, реализованого в `/main/static/util.js` и доступного при использовании любого из шаблонов в `abc/`</desc>
         <file><path>ajax</path>
@@ -104,8 +103,111 @@
             </method>
         </file>
     </folder>
-    <folder>
-        <path>doc</path>
+    <folder><path>py</path>
+        <title>Корень документации Python</title>
+        <file><path>models</path>
+            <title>Django-модели</title>
+            <model>
+                <name>User</name>
+                <desc>Модель для хранения данных пользователей</desc>
+                <arg>
+                    <name>username</name>
+                    <type>CharField[24]</type>
+                    <desc>Имя пользователя до 24 символов</desc>
+                </arg>
+                <arg>
+                    <name>password</name>
+                    <type>CharField[32]</type>
+                    <desc>Солёный хеш пароля пользователя. См. [здесь](/doc/py/util/security.md)</desc>
+                </arg>
+                <arg>
+                    <name>token</name>
+                    <type>CharField[32]</type>
+                    <desc>Текущий токен доступа пользователя</desc>
+                </arg>
+                <arg>
+                    <name>is_admin</name>
+                    <type>BooleanField</type>
+                    <desc>Является ли пользователь администратором</desc>
+                </arg>
+            </model>
+        </file>
+        <folder><path>util</path>
+            <title>Python-утилиты</title>
+            <desc>Список Python-утилит</desc>
+            <file><path>requests</path>
+                <title>Работа с запросами</title>
+                <desc>Утилиты для работы с запросами. Описано в [main.util](/main/util.py)</desc>
+                <method><name>getArgumentOr</name>
+                    <desc>Возвращает значение аргумента в указанном массиве или стандартное значение при его отсутствии. Как правило имеет тип String</desc>
+                    <arg><name>arr</name>
+                        <type>dict[K(str), V(str)]</type>
+                        <desc>Карта ключ-значение, в которой будет выполнен поиск аргумента</desc>
+                    </arg>
+                    <arg><name>name</name>
+                        <type>K (str)</type>
+                        <desc>Название параметра. Как правило имеет тип str</desc>
+                    </arg>
+                    <arg><name>default</name>
+                        <type>Any</type>
+                        <desc>Стандартное значение параметра</desc>
+                    </arg>
+                    <ret>V (str)|Any</ret>
+                </method>
+                <method><name>getGetOr</name>
+                    <desc>Алиас для `getArgumentOr`, где `arr = req.GET`</desc>
+                    <argsor>req, name, default</argsor>
+                    <ret>V(str)|Any</ret>
+                </method>
+                <method><name>getPostOr</name>
+                    <desc>Алиас для `getArgumentOr`, где `arr = req.POST`</desc>
+                    <argsor>req, name, default</argsor>
+                    <ret>V(str)|Any</ret>
+                </method>
+                <method><name>getSessOr</name>
+                    <desc>Алиас для `getArgumentOr`, где `arr = req.session`</desc>
+                    <argsor>req, name, default</argsor>
+                    <ret>V(str)|Any</ret>
+                </method>
+            </file>
+            <file><path>security</path>
+                <title>Безопасность</title>
+                <method><name>saltedHash</name>
+                    <desc>Вычисляет солёный SHA256-хеш данной строки и соли</desc>
+                    <arg><name>string</name>
+                        <type>str</type>
+                        <desc>Основная строка</desc>
+                    </arg>
+                    <arg><name>salt</name>
+                        <type>str</type>
+                        <desc>Соль</desc>
+                    </arg>
+                    <ret>str[32]</ret>
+                </method>
+                <method><name>grantNewToken</name>
+                    <desc>Поворачивает и возвращает токен доступа пользователя</desc>
+                    <arg><name>user</name>
+                        <type>User</type>
+                        <desc>Пользователь, для которого необходимо повернуть токен</desc>
+                    </arg>
+                    <ret>str[32]</ret>
+                </method>
+                <method><name>checkUser</name>
+                    <desc>Проверяет, действителен ли указанный токен пользователя</desc>
+                    <arg><name>username</name>
+                        <type>str</type>
+                        <desc>Имя пользователя для проверки токена</desc>
+                    </arg>
+                    <arg><name>token</name>
+                        <type>str[32]</type>
+                        <desc>Токен для проверки</desc>
+                    </arg>
+                    <ret>bool</ret>
+                </method>
+            </file>
+        </folder>
+    </folder>
+    <folder><path>doc</path>
         <title>Написание документации</title>
         <desc>Инструкция по написанию документации.</desc>
         <folder><path>tags</path>
@@ -217,6 +319,21 @@
                     <arg><name>arg</name>
                         <type>arg*?</type>
                         <desc>Дочерний элемент (необязательно, мульти-элемент)</desc>
+                    </arg>
+                </xmltag>
+                <xmltag><name>model</name>
+                    <desc>Django-модель</desc>
+                    <arg><name>name</name>
+                        <type>xs:string</type>
+                        <desc>Название модели</desc>
+                    </arg>
+                    <arg><name>desc</name>
+                        <type>xs:string</type>
+                        <desc>Описание модели</desc>
+                    </arg>
+                    <arg><name>arg</name>
+                        <type>arg*</type>
+                        <desc>Поле модели (мульти-элемент)</desc>
                     </arg>
                 </xmltag>
                 <xmltag><name>table</name>

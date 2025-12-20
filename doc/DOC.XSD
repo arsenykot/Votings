@@ -8,12 +8,31 @@
     </xs:sequence>
   </xs:complexType>
 
+  <!-- <xs:complexType name="field">
+    <xs:sequence>
+      <xs:element name="name" type="xs:string"/>
+      <xs:element name="type" type="xs:string"/>
+      <xs:element name="desc" type="xs:string"/>
+      <xs:element name="default" type="xs:string" default="-"/>
+      <xs:element name="ondelete" type="xs:string" default="-"/>
+    </xs:sequence>
+  </xs:complexType> -->
 
+
+
+  <xs:complexType name="model">
+    <xs:sequence>
+      <xs:element name="name" type="xs:string"/>
+      <xs:element name="desc" type="xs:string" minOccurs="0"/>
+      <xs:element name="arg" type="arg" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
 
   <xs:complexType name="method">
     <xs:sequence>
       <xs:element name="name" type="xs:string"/>
       <xs:element name="desc" type="xs:string" minOccurs="0"/>
+      <xs:element name="argsor" type="xs:string" minOccurs="0"/>
       <xs:element name="arg" type="arg" minOccurs="0" maxOccurs="unbounded"/>
       <xs:element name="ret" type="xs:string"/>
     </xs:sequence>
@@ -44,6 +63,7 @@
       <xs:element name="desc" type="xs:string" minOccurs="0"/>
       <xs:element name="method" type="method" minOccurs="0" maxOccurs="unbounded"/>
       <xs:element name="xmltag" type="xmltag" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="model" type="model" minOccurs="0" maxOccurs="unbounded"/>
       <xs:element name="table" type="table" minOccurs="0" maxOccurs="unbounded"/>
     </xs:sequence>
   </xs:complexType>
