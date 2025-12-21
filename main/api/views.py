@@ -1,10 +1,12 @@
 from django.http import HttpResponse
+from django.contrib.auth import authenticate, login, logout
 from main.util import *
 from main.models import *
 from time import time, sleep
+from django.shortcuts import redirect
 
 def test_api_view(req):
-    return HttpResponse(getSessOr(req, "token", "Unauthorized"))
+    return HttpResponse(str(req.user.is_authenticated))
 
 def auth_login_view(req):
     #sleep(2)
@@ -16,23 +18,17 @@ def auth_login_view(req):
         status = 400
         text = "BADREQUEST"
     else:
-        passwd = saltedHash(passwd, uname)
-        cuser = User.objects.filter(username=uname, password=passwd)
-        if len(cuser) <= 0:
+        user = authenticate(req, username=uname, password=passwd)
+        if user is None:
             text = "BADCREDENTIALS"
             status = 403
         else:
-            cuser = cuser.first()
-            text = grantNewToken(cuser)
-            req.session["token"] = text
-            req.session["username"] = uname
+            login(req, user)
     resp = HttpResponse(text)
     resp.status_code = status
     return resp
 
 def auth_logout_view(req):
-    req.session["token"] = None
-    resp = HttpResponse()
-    resp.status_code = 302
-    resp.headers["Location"] = "/"
-    return resp
+    if req.user.is_authenticated:
+        logout(req)
+    return redirect("/")

@@ -8,8 +8,7 @@
         <file><path>ajax</path>
             <title>Методы AJAX</title>
             <desc>Предоставляет методы для работы с AJAX. Функционал реализован в `/main/static/util.js` в регионе `ajax`</desc>
-            <method>
-                <name>ajaxQuery</name>
+            <method><name>ajaxQuery</name>
                 <desc>Осуществляет асинхронный запрос на сервер</desc>
                 <arg><name>endpoint</name>
                     <type>String</type>
@@ -37,14 +36,14 @@
                 </arg>
                 <ret>null</ret>
             </method>
-            <method>
-                <name>ajaxGet</name>
+            <method><name>ajaxGet</name>
                 <desc>Алиас для `ajaxQuery`, где `method="GET"`</desc>
+                <argsor>endpoint, ready_callback, error_passthrough, httpheaders</argsor>
                 <ret>null</ret>
             </method>
-            <method>
-                <name>ajaxPost</name>
+            <method><name>ajaxPost</name>
                 <desc>Алиас для `ajaxQuery`, где `method="POST"`</desc>
+                <argsor>endpoint, ready_callback, data, error_passthrough, httpheaders</argsor>
                 <ret>null</ret>
             </method>
             <table><name>Примечание: Формат фиктивного объекта AJAXResponse</name>
@@ -107,30 +106,6 @@
         <title>Корень документации Python</title>
         <file><path>models</path>
             <title>Django-модели</title>
-            <model>
-                <name>User</name>
-                <desc>Модель для хранения данных пользователей</desc>
-                <arg>
-                    <name>username</name>
-                    <type>CharField[24]</type>
-                    <desc>Имя пользователя до 24 символов</desc>
-                </arg>
-                <arg>
-                    <name>password</name>
-                    <type>CharField[32]</type>
-                    <desc>Солёный хеш пароля пользователя. См. [здесь](/doc/py/util/security.md)</desc>
-                </arg>
-                <arg>
-                    <name>token</name>
-                    <type>CharField[32]</type>
-                    <desc>Текущий токен доступа пользователя</desc>
-                </arg>
-                <arg>
-                    <name>is_admin</name>
-                    <type>BooleanField</type>
-                    <desc>Является ли пользователь администратором</desc>
-                </arg>
-            </model>
         </file>
         <folder><path>util</path>
             <title>Python-утилиты</title>
@@ -183,26 +158,6 @@
                         <desc>Соль</desc>
                     </arg>
                     <ret>str[32]</ret>
-                </method>
-                <method><name>grantNewToken</name>
-                    <desc>Поворачивает и возвращает токен доступа пользователя</desc>
-                    <arg><name>user</name>
-                        <type>User</type>
-                        <desc>Пользователь, для которого необходимо повернуть токен</desc>
-                    </arg>
-                    <ret>str[32]</ret>
-                </method>
-                <method><name>checkUser</name>
-                    <desc>Проверяет, действителен ли указанный токен пользователя</desc>
-                    <arg><name>username</name>
-                        <type>str</type>
-                        <desc>Имя пользователя для проверки токена</desc>
-                    </arg>
-                    <arg><name>token</name>
-                        <type>str[32]</type>
-                        <desc>Токен для проверки</desc>
-                    </arg>
-                    <ret>bool</ret>
                 </method>
             </file>
         </folder>

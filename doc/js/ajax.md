@@ -16,10 +16,10 @@
 
 
 
-### `ajaxGet() -> null`
+### `ajaxGet(endpoint, ready_callback, error_passthrough, httpheaders) -> null`
 Алиас для `ajaxQuery`, где `method="GET"`
 
-### `ajaxPost() -> null`
+### `ajaxPost(endpoint, ready_callback, data, error_passthrough, httpheaders) -> null`
 Алиас для `ajaxQuery`, где `method="POST"`
 
 ### Примечание: Формат фиктивного объекта AJAXResponse

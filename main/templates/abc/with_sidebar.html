@@ -18,7 +18,7 @@
                 <hr>
                 <div>
                     <ul class="nav nav-pills flex-column mb-auto">
-                        {% if logged_in %}
+                        {% if request.user.is_authenticated %}
                         <li class="nav-item">
                             <a href="/account/settings" class="nav-link link-body-emphasis">
                                 <i class="bi bi-gear-fill"></i>
