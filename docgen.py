@@ -60,18 +60,17 @@ def parseDoc(element, prefix = ""):
         "type": "file",
         "title": findTxt(element, "title"),
         "desc": findTxt(element, "desc"),
-        "xmltags": [],
-        "methods": [],
-        "models": [],
-        "tables": []
+        "entries": []
     }
     ofp = prefix+"/"+find(element, "path").text+".md"
     print("Parsing: "+ofp)
     struct["path"] = ofp
     for elem in element:
         print("- "+elem.tag)
-        match elem.tag:
-            case "{.}method":
+        if elem.tag.replace("{.}", "") in ["path", "title", "desc"]:
+            continue
+        match elem.tag.replace("{.}",""):
+            case "method":
                 mstruct = {
                     "type": "method",
                     "name": findTxt(elem, "name"),
@@ -86,8 +85,9 @@ def parseDoc(element, prefix = ""):
                         "type": findTxt(arg, "type"),
                         "desc": findTxt(arg, "desc")
                         })
-                struct["methods"].append(mstruct)
-            case "{.}model":
+                struct["entries"].append(mstruct)
+
+            case "model":
                 mstruct = {
                     "type": "model",
                     "name": findTxt(elem, "name"),
@@ -100,8 +100,9 @@ def parseDoc(element, prefix = ""):
                         "type": findTxt(arg, "type"),
                         "desc": findTxt(arg, "desc")
                         })
-                struct["models"].append(mstruct)
-            case "{.}xmltag":
+                struct["entries"].append(mstruct)
+
+            case "xmltag":
                 xstruct = {
                     "type": "xmltag",
                     "name": findTxt(elem, "name"),
@@ -114,8 +115,9 @@ def parseDoc(element, prefix = ""):
                         "type": findTxt(arg, "type"),
                         "desc": findTxt(arg, "desc")
                         })
-                struct["xmltags"].append(xstruct)
-            case "{.}table":
+                struct["entries"].append(xstruct)
+
+            case "table":
                 tstruct = {
                     "type": "table",
                     "name": findTxt(elem, "name"),
@@ -124,7 +126,37 @@ def parseDoc(element, prefix = ""):
                 }
                 for row in elem.findall("{.}row"):
                     tstruct["rows"].append(row.text)
-                struct["tables"].append(tstruct)
+                struct["entries"].append(tstruct)
+
+            case "endpoint":
+                estruct = {
+                    "type": "endpoint",
+                    "path": findTxt(elem, "path"),
+                    "desc": findTxt(elem, "desc"),
+                    "method": findTxt(elem, "method"),
+                    "args": [],
+                    "resps": []
+                }
+                for arg in elem.findall("{.}arg"):
+                    estruct["args"].append({
+                        "name": findTxt(arg, "name"),
+                        "type": findTxt(arg, "type"),
+                        "desc": findTxt(arg, "desc")
+                        })
+                for resp in elem.findall("{.}resp"):
+                    estruct["resps"].append({
+                        "code": findTxt(resp, "code"),
+                        "when": findTxt(resp, "when"),
+                        "data": findTxt(resp, "data"),
+                        "desc": findTxt(resp, "desc")
+                        })
+                struct["entries"].append(estruct)
+            case _:
+                tstruct = {
+                    "type": "unknown",
+                    "tag": elem.tag.replace("{.}","")
+                }
+                struct["entries"].append(tstruct)
     return struct
 
 def parseIndex(element, prefix = ""):
@@ -157,17 +189,21 @@ def generateIndex(struct, prefix = ""):
 
 def renderArgs(arr, header, item_fstr, item_tuple,  item_vars):
     ofc = ""
-    argnames = []
     ftable = [header]
     for arg in arr:
-        argnames.append(arg["name"])
         ftable.append(item_fstr%eval(item_tuple, locals=locals(), globals=item_vars))
-    argnames = ", ".join(argnames)
     if len(ftable) > 1:
         ofc += "\n"
         ofc += csv2md(ftable)
         ofc += "\n"
-    return ofc, argnames
+    return ofc, combineArgs(arr)
+
+def combineArgs(arr, delimiter=", "):
+    argnames = []
+    for arg in arr:
+        if "name" in arg.keys():
+            argnames.append(arg["name"])
+    return delimiter.join(argnames)
 
 def renderStruct(struct, parent=None):
     print("Rendering: "+struct["path"])
@@ -191,27 +227,55 @@ def renderStruct(struct, parent=None):
                 renderStruct(elem, struct["path"])
         case "file":
             ofc = "# %s\n%s\n\n%s"%(struct["title"], links, struct["desc"])
-            for method in struct["methods"]:
-                cofc, argnames = renderArgs(method["args"], "Параметр;Тип;Описание", "`%s`;`%s`;%s", "(arg['name'], arg['type'], arg['desc'])", {})
-                if method["force_args"] != "":
-                    argnames = method["force_args"]
-                ofc += "\n\n### `%s(%s) -> %s`\n%s"%(method["name"], argnames, method["ret"], method["desc"]) + cofc
-
-            for xmltag in struct["xmltags"]:
-                cofc, argnames = renderArgs(xmltag["args"], "Параметр;Тип;Описание", "`%s`;`%s`;%s", "(arg['name'], arg['type'], arg['desc'])", {})
-                ofc += "\n\n### `<%s>`\n%s"%(xmltag["name"], xmltag["desc"]) + cofc
-
-            for model in struct["models"]:
-                cofc, argnames = renderArgs(model["args"], "Поле;Тип;Описание", "`%s`;`%s`;%s", "(arg['name'], arg['type'], arg['desc'])", {})
-                ofc += "\n\n### `%s`\n%s"%(model["name"], model["desc"]) + cofc
-
-            for table in struct["tables"]:
-                ofc += "\n\n### %s"%(table["name"])
-                ftable = table["rows"]
-                ftable.insert(0, table["header"])
-                if len(ftable) > 1:
-                    ofc += "\n"
-                    ofc += csv2md(ftable)
+            for entry in struct["entries"]:
+                match entry["type"]:
+                    case "method":
+                        cofc, argnames = renderArgs(entry["args"], "Параметр;Тип;Описание", "`%s`;`%s`;%s", "(arg['name'], arg['type'], arg['desc'])", {})
+                        if entry["force_args"] != "":
+                            argnames = entry["force_args"]
+                        ofc += "\n\n### `%s(%s) -> %s`\n%s"%(entry["name"], argnames, entry["ret"], entry["desc"]) + cofc
+                    case "xmltag":
+                        cofc, argnames = renderArgs(entry["args"], "Параметр;Тип;Описание", "`%s`;`%s`;%s", "(arg['name'], arg['type'], arg['desc'])", {})
+                        ofc += "\n\n### `<%s>`\n%s"%(entry["name"], entry["desc"]) + cofc
+                    case "model":
+                        cofc, argnames = renderArgs(entry["args"], "Поле;Тип;Описание", "`%s`;`%s`;%s", "(arg['name'], arg['type'], arg['desc'])", {})
+                        ofc += "\n\n### `%s`\n%s"%(entry["name"], entry["desc"]) + cofc
+                    case "table":
+                        ofc += "\n\n### %s"%(entry["name"])
+                        ftable = entry["rows"]
+                        ftable.insert(0, entry["header"])
+                        if len(ftable) > 1:
+                            ofc += "\n"
+                            ofc += csv2md(ftable)
+                    case "endpoint":
+                        dat = entry["path"]
+                        ct = ""
+                        if len(entry["args"]) > 0:
+                            ct += "\n\n#### Требуемые аргументы:"
+                            dat += "?"+combineArgs(entry["args"], "&")
+                            cofc, argnames = renderArgs(entry["args"], "Аргумент;Тип;Описание", "`%s`;`%s`;%s", "(arg['name'], arg['type'], arg['desc'])", {})
+                            ct += cofc
+                        ofc += "\n\n### `/%s` (%s)"%(dat, entry["method"])
+                        ofc += "\n\n"+entry["desc"]
+                        ofc += ct
+                        if len(entry["resps"]) > 0:
+                            ofc += "\n\n#### Эндпоинт возвращает:"
+                            he, fs, ft = "Статус;Данные;Когда", "`%s`;`%s`;%s", "(arg['code'], arg['data'], arg['when']"
+                            dox = False
+                            for resp in entry["resps"]:
+                                if resp["desc"] != "":
+                                    dox = True
+                                    break
+                            if dox:
+                                he += ";Комментарий"
+                                fs += ";%s"
+                                ft += ", arg['desc']"
+                            ft += ")"
+                            cofc, argnames = renderArgs(entry["resps"], he, fs, ft, {})
+                            ofc += cofc
+                    case "unknown":
+                        ofc += "\n\n### \<_Неопознанный элемент с меткой `"+entry["tag"]+"`_>"
+                        
 
             ofc += APPENDIX
             ofd = open("."+struct["path"], "w+", encoding="utf-8")

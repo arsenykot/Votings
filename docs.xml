@@ -2,6 +2,37 @@
 <docs xmlns="." xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation=". doc/DOC.XSD">
     <path>doc</path>
     <title>Корень документации</title>
+    <folder><path>api</path>
+        <title>Корень документации API</title>
+        <file><path>auth</path>
+            <title>Эндпоинты, связанные с автозирацией</title>
+            <endpoint><path>api/login</path>
+                <method>POST</method>
+                <desc>Попытаться войти в систему с указанным именем пользователя и паролем</desc>
+                <arg><name>username</name>
+                    <type>str</type>
+                    <desc>Имя пользователя</desc>
+                </arg>
+                <arg><name>password</name>
+                    <type>str</type>
+                    <desc>Пароль</desc>
+                </arg>
+                <resp><code>400</code><data>BADREQUEST</data>
+                    <when>Недостаточно аргументов</when>
+                </resp>
+                <resp><code>403</code><data>BADCREDENTIALS</data>
+                    <when>Переданные имя пользователя и / или пароль неверны</when>
+                </resp>
+                <resp><code>200</code><data>OK</data>
+                    <when>Авторизация прошла успешно</when>
+                </resp>
+            </endpoint>
+            <endpoint><path>api/logout</path>
+                <method>GET / POST</method>
+                <desc>Выйти из аккаунта пользователя и перейти на главную страницу</desc>
+            </endpoint>
+        </file>
+    </folder>
     <folder><path>js</path>
         <title>Корень документации JavaScript</title>
         <desc>Документация для функционала, реализованого в `/main/static/util.js` и доступного при использовании любого из шаблонов в `abc/`</desc>

@@ -7,9 +7,16 @@
 python manage.py makemigrations
 python manage.py migrate
 ```
+
+- Создайте аккаунт Администратора:
+```
+python manage.py createsuperuser
+```
+
 - Запустите сервер:
 ```
 python manage.py runserver
 ```
+
 ## Разработка
 - Ознакомьтесь с [документацией](/doc/index.md)

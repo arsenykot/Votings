@@ -2,6 +2,8 @@
 
 
 
+- [Корень документации API](/doc/api/index.md)
+- - [Эндпоинты, связанные с автозирацией](/doc/api/auth.md)
 - [Корень документации JavaScript](/doc/js/index.md)
 - - [Методы AJAX](/doc/js/ajax.md)
 - - [Утилиты для HTML](/doc/js/htmlutils.md)
