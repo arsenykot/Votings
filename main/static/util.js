@@ -67,26 +67,26 @@ function ajaxQuery(endpoint, method, ready_callback, data = null, error_passthro
     });
     queryXHR.addEventListener("error", errorCallback);
     try{
-        queryXHR.open(method, endpoint);
+        let newdata = "";
+        for(key in data){
+            newdata += encodeURIComponent(key)+"="+encodeURIComponent(data[key])+"&";
+        }
+        let addr = "";
+        if(method=="GET"){
+            addr = endpoint + "?" + newdata;
+        }
+        else{
+            addr = endpoint;
+        }
+        queryXHR.open(method, addr);
         httpheaders.forEach(pair => {
             queryXHR.setRequestHeader(pair[0], pair[1]);
         });
         if(method == "POST"){
             queryXHR.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-            let newdata = "";
-            for(key in data){
-                newdata += encodeURIComponent(key)+"="+encodeURIComponent(data[key])+"&";
-            }
+            console.log(data); console.log(newdata);
             data = newdata;
         }
-        else{
-            if(data == null){}
-            else{
-                queryXHR.setRequestHeader('Content-Type', 'application/json');
-                data = JSON.stringify(data);
-            }
-        }
-        
         queryXHR.send(data);
     }
     catch(e){
@@ -94,7 +94,7 @@ function ajaxQuery(endpoint, method, ready_callback, data = null, error_passthro
     }
     
 }
-function ajaxGet(endpoint, ready_callback, error_passthrough=false, httpheaders=[]){ajaxQuery(endpoint, "GET", ready_callback, error_passthrough, httpheaders);}
+function ajaxGet(endpoint, ready_callback, data, error_passthrough=false, httpheaders=[]){ajaxQuery(endpoint, "GET", ready_callback, data, error_passthrough, httpheaders);}
 function ajaxPost(endpoint, ready_callback, data, error_passthrough=false, httpheaders=[]){ajaxQuery(endpoint, "POST", ready_callback, data, error_passthrough, httpheaders);}
 function buildAjaxFormHandler(callback){
     return function(e){
@@ -138,3 +138,32 @@ function buildAjaxFormHandler(callback){
     }
 }
 //#endregion ajax
+//#region formvalidation
+function validateForm(form){
+    let is_valid = true;
+    let inputs = form.querySelectorAll("input");
+    let submit_button = form.querySelector("input[type='submit']");
+    if (!submit_button) submit_button = form.querySelector("button[type='submit']");
+    inputs.forEach(input=>{
+        if(input.hasAttribute("data-skiponfull")) return;
+        if (!validateFormInput(input)){
+            is_valid = false;
+        }
+        if (!submit_button && input.type == "submit") submit_button = input;
+    });
+    if(submit_button) submit_button.disabled = !is_valid;
+    return is_valid;
+}
+function validateFormInput(input){
+    let VALID = true;
+    input.classList.remove("is-valid", "is-invalid");
+    if (input.min && input.type=="number") VALID = VALID && input.value >= input.min;
+    if (input.min && input.type!="number") VALID = VALID && input.value.length >= input.min;
+
+    if (input.max && input.type=="number") VALID = VALID && input.value <= input.max;
+    if (input.max && input.type!="number") VALID = VALID && input.value.length <= input.max;
+
+    input.classList.add(VALID?"is-valid":"is-invalid");
+    return VALID;
+}
+//#endregion formvalidation

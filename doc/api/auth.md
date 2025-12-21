@@ -3,7 +3,7 @@
 
 
 
-### `/api/login?username&password` (POST)
+### `/api/auth/login?username&password` (POST)
 
 Попытаться войти в систему с указанным именем пользователя и паролем
 
@@ -24,7 +24,7 @@
 
 
 
-### `/api/logout` (GET / POST)
+### `/api/auth/logout` (GET / POST)
 
 Выйти из аккаунта пользователя и перейти на главную страницу
 

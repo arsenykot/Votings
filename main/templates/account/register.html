@@ -1,0 +1,97 @@
+{% extends "abc/base.html" %}
+{% block content %}
+<div style="display: flex; align-items: center; justify-content: center; height: 100%; width: 100%;">
+    <form style="width: 330px; padding: 1rem;" id="registerform" action="/api/registration/register" autocomplete="off">
+        <h1 class="h3 mb-3 fw-normal">Register</h1>
+        {% csrf_token %}
+        <div class="form-floating">
+            <input type="text" class="form-control top" id="uname" placeholder="Username" value="{{username}}" min="4" max="24" name="username" data-skiponfull required>
+            <label for="uname">Username</label>
+        </div>
+        <div class="form-floating">
+            <input type="password" class="form-control middle" id="pwd1" placeholder="Password" name="password" min="8" required>
+            <label for="pwd1">Password</label> 
+        </div>
+        <div class="form-floating">
+            <input type="password" class="form-control bottom" id="pwd2" placeholder="Repeat password" name="password" min="8" required>
+            <label for="pwd2">Repeat password</label> 
+        </div> 
+        <br>
+        <button class="btn btn-primary w-100 py-2" type="submit" id="submit" data-spinner-text="Registering...">Register</button>
+        <p class="mt-1 mb-1 text-body-secondary">Already have an account? <a href="/account/login">Log in</a></p>
+        <p class="mt-5 mb-3 text-body-secondary">© 2025</p> 
+    </form>
+    <script>
+        let sbmt = document.getElementById("submit");
+        document.getElementById("uname").addEventListener("input", function(e){
+            let username = document.getElementById("uname");
+            let cc = username.value;
+            if(!validateFormInput(uname)) return;
+            if (cc.includes(" ")){
+                sbmt.disabled = true;
+                username.classList.add("is-invalid");
+                return;
+            }
+            username.classList.remove("is-invalid");
+            username.classList.remove("is-valid");
+            setTimeout(function(){
+            if (cc == username.value){
+                ajaxGet("/api/registration/check_name", function(resp){
+                    if(resp.status==200 && resp.content == "OK"){
+                        username.classList.add("is-valid");
+                        sbmt.disabled = false;
+                    }
+                    else{
+                        sbmt.disabled = true;
+                        username.classList.add("is-invalid");
+                        username.focus();
+                    }
+                },{"username": username.value});
+                }
+            }, 500);
+        });
+        document.getElementById("pwd1").addEventListener("input", function(e){
+            if(document.querySelector("input#pwd1").value.length < 8){
+                document.querySelector("input#pwd1").classList.add("is-invalid");
+                sbmt.disabled = true;
+            }
+            else{
+                document.querySelector("input#pwd1").classList.remove("is-invalid");
+                document.querySelector("input#pwd1").classList.add("is-valid");
+                sbmt.disabled = false;
+            }
+        });
+        document.getElementById("pwd2").addEventListener("input", function(e){
+            if(document.querySelector("input#pwd1").value != document.querySelector("input#pwd2").value){
+                document.querySelector("input#pwd2").classList.add("is-invalid");
+                sbmt.disabled = true;
+            }
+            else{
+                document.querySelector("input#pwd2").classList.remove("is-invalid");
+                document.querySelector("input#pwd2").classList.add("is-valid");
+                sbmt.disabled = false;
+            }
+        });
+        let registerFn = buildAjaxFormHandler(function(resp){
+            if(resp.status == 200) window.location.replace("/");
+            else{
+                if(resp.content == "BADREQUEST"){
+                    spawnToast("danger", "exclamation-octagon-fill", "Something went wrong. Please try again.");
+                }
+                else if(resp.content=="USERNAMETAKEN"){
+                    spawnToast("danger", "exclamation-octagon-fill", "This username is already taken.");
+                }
+            }
+        });
+        document.getElementById("registerform").onsubmit = function(e){
+            e.preventDefault();
+            validateForm(e.target);
+            if(e.target.querySelector("input#pwd1").value != e.target.querySelector("input#pwd2").value){
+                e.target.querySelector("input#pwd2").classList.add("is-invalid");
+                return;
+            }
+            registerFn(e);
+        };
+    </script>
+</div>
+{% endblock %}

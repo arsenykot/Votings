@@ -9,3 +9,8 @@ def login_page_view(req):
     return render(req, "account/login.html", {
         "username": uname
     })
+def register_page_view(req):
+    uname = getGetOr(req, "username", "")
+    return render(req, "account/register.html", {
+        "username": uname
+    })

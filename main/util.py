@@ -1,5 +1,7 @@
 from hashlib import sha256
 from time import time
+from django.contrib.auth.models import User
+from django.http import HttpResponse
 
 def getArgumentOr(args, name, default):
     if(name in args.keys()):
@@ -23,3 +25,11 @@ def saltedHash(string, salt):
             )).digest()+
             bytes(salt, encoding="utf-8")
         ).hexdigest()
+
+def user_exists(username):
+    return len(User.objects.filter(username=username)) > 0
+
+def respond(status, data):
+    r = HttpResponse(data)
+    r.status_code = status
+    return r
