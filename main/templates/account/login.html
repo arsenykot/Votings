@@ -20,6 +20,7 @@
         <p class="mt-5 mb-3 text-body-secondary">© 2025</p> 
     </form>
     <script>
+        console.log("{{ error }}");
         document.getElementById("loginform").onsubmit = buildAjaxFormHandler(function(resp){
             //console.log(resp);
             if(resp.status == 200) window.location.replace("/");
@@ -29,6 +30,9 @@
                 }
             }
         });
+        if("{{ error }}" == "new"){
+            spawnToast("danger", "exclamation-octagon-fill", "Cannot create voting without logging in.");
+        }
     </script>
 </div>
 {% endblock %}

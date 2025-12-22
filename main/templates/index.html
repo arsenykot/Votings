@@ -2,6 +2,8 @@
 {% block content %}
 <h1>Hello, World!</h1>
 <button class="btn btn-primary" id="test-button" style="max-width: 30vw;">Click here!</button>
+<br>
+<button class="btn btn-primary" id="create-button" style="max-width: 30vw;">Create a voting</button>
 <script>
 let testButton = document.getElementById("test-button");
 testButton.addEventListener("click",function(e){
@@ -12,6 +14,15 @@ testButton.addEventListener("click",function(e){
         testButton.disabled = false;
         testButton.innerText = "Click here!";
     }, 2000);
+});
+
+let createButton = document.getElementById("create-button");
+createButton.addEventListener("click",function(e){
+    setSpinner(createButton, "Loading");
+    createButton.disabled = true;
+    setTimeout(function(){
+        window.location.replace("/votings/new");
+    }, 1000);
 });
 </script>
 {% endblock %}
