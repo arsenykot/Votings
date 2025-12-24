@@ -1,0 +1,70 @@
+{% extends "abc/base.html" %}
+{% block content %}
+<div style="display: flex; align-items: center; justify-content: center; height: 100%; width: 100%;">
+    <form style="width: 330px; padding: 1rem;" id="newform" action="/api/new">
+        <h1 class="h3 mb-3 fw-normal">Create a voting</h1>
+        {% csrf_token %}
+        <div class="form-floating">
+            <input type="text" class="form-control top" id="floatingOption1" placeholder="Option 1" value="{{username}}" max-length="24" name="option1" required>
+            <label for="floatingOption1">Option 1</label>
+        </div>
+        <div class="form-floating">
+            <input type="text" class="form-control bottom" id="floatingOption2" placeholder="Option 2" name="option2" required>
+            <label for="floatingOption2">Option 2</label> 
+        </div>
+        <div class="form-check text-start my-3">
+            <input class="form-check-input close" type="radio" value="auto-close" id="close1" name="close" checked=true>
+            <label class="form-check-label" for="close2">Automatically close the voting</label>
+            <br>
+            <input class="form-check-input close" type="radio" value="manual-close"  id="close2" name="close"> 
+            <label class="form-check-label" for="close2">Close the voting manually</label>
+        </div>
+        <div class="form-small" id="datetimeForm">
+            <input class="form-control top datetime" type="date" id="datetime1">
+            <input class="form-control bottom datetime" type="time" id="datetime2">
+        </div>
+        <label for="datetimeForm">Choose automatic close date</label>
+        <br><br>
+        <button class="btn btn-primary w-100 py-2" type="submit" data-spinner-text="Creating your voting...">Create</button>
+        <p class="mt-5 mb-3 text-body-secondary">© 2025</p> 
+    </form>
+    <script>
+        document.getElementById("newform").onsubmit = buildAjaxFormHandler(function(resp){
+            //console.log(resp);
+            if(resp.status == 200) window.location.replace("/");
+            else{
+                if(resp.content == "BADCREDENTIALS"){
+                    spawnToast("danger", "exclamation-octagon-fill", "Invalid credentials. Please try again.");
+                }
+            }
+        });
+
+        const radio1 = document.getElementById("close1");
+        const datetime1 = document.getElementById("datetime1");
+        const radio2 = document.getElementById("close2");
+        const datetime2 = document.getElementById("datetime2");
+        radio1.addEventListener("input", (event) => {
+            console.log("event");
+            if(document.getElementById("close1").checked){
+                datetime1.disabled=false;
+                datetime2.disabled=false;
+            }
+            else {
+                datetime1.disabled=true;
+                datetime2.disabled=true;
+            }
+        });
+        radio2.addEventListener("input", (event) => {
+            console.log("event");
+            if(document.getElementById("close1").checked){
+                datetime1.disabled=false;
+                datetime2.disabled=false;
+            }
+            else {
+                datetime1.disabled=true;
+                datetime2.disabled=true;
+            }
+        });
+    </script>
+</div>
+{% endblock %}

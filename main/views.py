@@ -15,7 +15,10 @@ def login_page_view(req):
     })
 
 def new_voting_view(req):
-    if auth.get_user(req).is_authenticated:
-        return HttpResponse("this is new voting page")
+    if req.user.is_authenticated:
+        username = getGetOr(req, "username", "")
+        return render(req, "votings/new.html", {
+            "username": username
+        })
     else:
         return redirect("/account/login?error=new")
