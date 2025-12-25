@@ -40,9 +40,7 @@
     z-index: 1;
 }
 
-.form-control.single{
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
+.form-control.txtarea{
+    resize: none;
+    height: 160px;
 }

@@ -32,3 +32,14 @@ def auth_logout_view(req):
     if req.user.is_authenticated:
         logout(req)
     return redirect("/")
+
+def voting_new_view(req):
+    name = getPostOr(req, "name", False)
+    desc = getPostOr(req, "description", False)
+    option1 = getPostOr(req, "option1", False)
+    option2 = getPostOr(req, "option2", False)
+    close = getPostOr(req, "close", False)
+    date = getPostOr(req, "date", False)
+    time = getPostOr(req, "time", False)
+    print(name, desc, option1, option2, close, date, time)
+    return HttpResponse("zov")
