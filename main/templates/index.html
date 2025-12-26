@@ -2,6 +2,21 @@
 {% block content %}
 <h1>Hello, World!</h1>
 <button class="btn btn-primary" id="test-button" style="max-width: 30vw;">Click here!</button>
+<br>
+<form action="/api/test" id="controltest">
+    {% csrf_token %}
+    <select name="select_test">
+        <option value="value 1">value 1</option>
+        <option value="value 2 works">value 2</option>
+    </select>
+    <textarea name="textarea_test">textarea works
+    </textarea>
+    <label><input type="radio" name="radio_test" value="option 1" checked> radio 1 option 1</label>
+    <label><input type="radio" name="radio_test" value="option 2"> radio 1 option 2</label>
+    <label><input type="radio" name="radio2_test" value="option 1"> radio 2 option 1</label>
+    <label><input type="radio" name="radio2_test" value="option 2" checked> radio 2 option 2</label>
+    <button type="submit">Submit</button>
+</form>
 <script>
 let testButton = document.getElementById("test-button");
 testButton.addEventListener("click",function(e){
@@ -12,6 +27,12 @@ testButton.addEventListener("click",function(e){
         testButton.disabled = false;
         testButton.innerText = "Click here!";
     }, 2000);
+});
+controltest.onsubmit = buildAjaxFormHandler(function(resp){
+    console.log(resp);
+    if(resp.status==200){
+        alert(resp.content);
+    }
 });
 </script>
 {% endblock %}

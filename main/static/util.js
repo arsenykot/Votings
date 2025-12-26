@@ -78,7 +78,8 @@ function ajaxQuery(endpoint, method, ready_callback, data = null, error_passthro
     try{
         let newdata = "";
         for(key in data){
-            newdata += encodeURIComponent(key)+"="+encodeURIComponent(data[key])+"&";
+            if(newdata.length>0) newdata += "&";
+            newdata += encodeURIComponent(key)+"="+encodeURIComponent(data[key]);
         }
         let addr = "";
         if(method=="GET"){
@@ -111,16 +112,27 @@ function buildAjaxFormHandler(callback){
         let form = e.target;
         let formElements = Array.from(form.querySelectorAll("input"));
         let formButtons = Array.from(form.querySelectorAll("button"));
-        formElements = formElements.concat(formButtons);
+        let formTextAreas = Array.from(form.querySelectorAll("textarea"));
+        let formSelects = Array.from(form.querySelectorAll("select"));
+
+        formElements = formElements.concat(formButtons, formTextAreas, formSelects);
         let headers = [];
         let requestData = {};
         let spinnerElements = [];
         formElements.forEach(element => {
             if(element.name=="csrfmiddlewaretoken") headers.push(["X-CSRFToken", element.value]);
-            requestData[element.name] = element.value;
+
+            if(element.type=="checkbox") requestData[element.name] = element.checked ? "on":"off";
+            else if(element.type=="radio"){
+                if(element.checked) requestData[element.name] = element.value;
+            }
+            else if(element.type=="submit") {}
+            else requestData[element.name] = element.value;
+
             element.setAttribute("data-was-disabled", element.disabled);
             element.disabled = true;
         });
+
         formButtons.forEach(element => {
             if(element.hasAttribute("data-spinner-text")){
                 element.setAttribute("data-default-text", element.innerText);
@@ -128,6 +140,7 @@ function buildAjaxFormHandler(callback){
                 spinnerElements.push(element);
             }
         });
+
         let responseHandler = function(resp){
             spinnerElements.forEach(element => {
                 element.innerText = element.getAttribute("data-default-text");
