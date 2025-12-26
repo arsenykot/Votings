@@ -44,6 +44,9 @@
                 <resp><code>400</code><data>BADREQUEST</data>
                     <when>Не указано имя пользователя</when>
                 </resp>
+                <resp><code>400</code><data>REGEX</data>
+                    <when>Имя пользователя содержит недопустимые символы</when>
+                </resp>
                 <resp><code>200</code><data>OK</data>
                     <when>Указанное имя свободно</when>
                 </resp>
@@ -64,6 +67,9 @@
                 </arg>
                 <resp><code>400</code><data>BADREQUEST</data>
                     <when>Недостаточно аргументов или формат аргументов некорректный</when>
+                </resp>
+                <resp><code>400</code><data>REGEX</data>
+                    <when>Имя пользователя содержит недопустимые символы</when>
                 </resp>
                 <resp><code>400</code><data>USERNAMETAKEN</data>
                     <when>Имя пользователя занято</when>
@@ -170,6 +176,22 @@
                     <type>HTMLElement</type>
                     <desc>HTML-элемент, в который требуется поместить тост. По умолчанию элемент с ID `toast-container`</desc>
                 </arg>
+                <ret>null</ret>
+            </method>
+            <method><name>errorToast</name>
+                <desc>Создаёт toast с ошибкой, если код ошибки отличается от предыдущего созданного</desc>
+                <arg><name>error</name>
+                    <type>String</type>
+                    <desc>Внутреннее название ошибки. Используется для предотвращения спама ошибками</desc>
+                </arg>
+                <arg><name>text</name>
+                    <type>String</type>
+                    <desc>Текст ошибки</desc>
+                </arg>
+                <ret>null</ret>
+            </method>
+            <method><name>clearError</name>
+                <desc>Очищает последнюю созданную ошибку через errorToast</desc>
                 <ret>null</ret>
             </method>
         </file>

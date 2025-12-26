@@ -23,17 +23,27 @@
     </form>
     <script>
         let sbmt = document.getElementById("submit");
+        const usernamere = /^([a-z0-9\.]{4,24})$/;
         document.getElementById("uname").addEventListener("input", function(e){
             let username = document.getElementById("uname");
             let cc = username.value;
-            if(!validateFormInput(uname)) return;
-            if (cc.includes(" ")){
+            if (!validateFormInput(username)){
+                if (cc.length < 4){
+                    errorToast("tooshort", "Your username is too short. Must be at least 4 characters.");
+                } else if (cc.length > 24){
+                    errorToast("toolong", "Your username is too long. Must be at most 24 characters.");
+                }
+                return;
+            }
+            if (!usernamere.test(cc)){
+                errorToast("regex", "Your username contains illegal characters. It can only contain the following: a-z, 0-9, '.'.");
                 sbmt.disabled = true;
                 username.classList.add("is-invalid");
                 return;
             }
             username.classList.remove("is-invalid");
             username.classList.remove("is-valid");
+            clearError();
             setTimeout(function(){
             if (cc == username.value){
                 ajaxGet("/api/registration/check_name", function(resp){
@@ -75,11 +85,14 @@
         let registerFn = buildAjaxFormHandler(function(resp){
             if(resp.status == 200) window.location.replace("/");
             else{
-                if(resp.content == "BADREQUEST"){
-                    spawnToast("danger", "exclamation-octagon-fill", "Something went wrong. Please try again.");
+                if(resp.content=="USERNAMETAKEN"){
+                    errorToast("letaken", "This username is already taken.");
                 }
-                else if(resp.content=="USERNAMETAKEN"){
-                    spawnToast("danger", "exclamation-octagon-fill", "This username is already taken.");
+                else if(resp.content=="REGEX"){
+                    errorToast("leregex", "Your username contains illegal characters.")
+                }
+                else{
+                    errorToast("legeneric_"+resp.content, "Something went wrong: <i>"+resp.content+"</i>");
                 }
             }
         });

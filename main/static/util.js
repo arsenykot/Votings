@@ -41,6 +41,15 @@ function setSpinner(element, text, size="sm", type="border"){
     label.innerText = text;
     element.appendChild(label);
 }
+let LAST_SEEN_ERROR_TOAST = null;
+function errorToast(error, text){
+    if(error==LAST_SEEN_ERROR_TOAST) return;
+    LAST_SEEN_ERROR_TOAST = error;
+    spawnToast("danger", "exclamation-octagon-fill", text);
+}
+function clearError(){
+    LAST_SEEN_ERROR_TOAST = null;
+}
 //#endregion htmlutils
 //#region ajax
 function ajaxQuery(endpoint, method, ready_callback, data = null, error_passthrough = false, httpheaders=[]){

@@ -5,12 +5,16 @@ from django.shortcuts import redirect
 from main.util import *
 from main.models import *
 from django.http import HttpResponse
+import re
 
 def name_view(req):
     uname = getGetOr(req, "username", False)
-
+    
     if uname == False:
         return respond(400, "BADREQUEST")
+    uname = uname.lower()
+    if not re.fullmatch(USERNAME_RE_MATCH, uname):
+        return respond(400, "REGEX")
     if user_exists(uname):
         return respond(200, "TAKEN")
     
@@ -22,6 +26,9 @@ def register_view(req):
     
     if uname == False or passwd == False:
         return respond(400, "BADREQUEST")
+    uname = uname.lower()
+    if not re.fullmatch(USERNAME_RE_MATCH, uname):
+        return respond(400, "REGEX")
     if user_exists(uname):
         return respond(400, "USERNAMETAKEN")
     if len(uname) > 24 or len(uname) < 4 or len(passwd) < 8:

@@ -10,6 +10,7 @@ def login_view(req):
     passwd = getPostOr(req, "password", False)
     if uname == False or passwd == False:
         return respond(400, "BADREQUEST")
+    uname = uname.lower()
     user = authenticate(req, username=uname, password=passwd)
     if user is None:
         return respond(403, "BADCREDENTIALS")
