@@ -5,6 +5,7 @@
 - [Корень документации API](/doc/api/index.md)
 - - [Эндпоинты, связанные с автозирацией](/doc/api/auth.md)
 - - [Эндпоинты, связанные с регистрацией](/doc/api/registration.md)
+- - [Эндпоинты, связанные с голосованиями](/doc/api/votings.md)
 - [Корень документации JavaScript](/doc/js/index.md)
 - - [Методы AJAX](/doc/js/ajax.md)
 - - [Утилиты для HTML](/doc/js/htmlutils.md)
