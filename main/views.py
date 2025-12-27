@@ -14,3 +14,6 @@ def register_page_view(req):
     return render(req, "account/register.html", {
         "username": uname
     })
+
+def profile_page_view(req):
+    return render(req, "account/profile.html")
