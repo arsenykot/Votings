@@ -1,7 +1,7 @@
 {% extends "abc/base.html" %}
 {% block content %}
 <div style="display: flex; align-items: center; justify-content: center; height: 100%; width: 100%;">
-    <form style="width: 330px; padding: 1rem;" id="loginform" action="/api/login">
+    <form style="width: 330px; padding: 1rem;" id="loginform" action="/api/auth/login">
         <h1 class="h3 mb-3 fw-normal">Log in</h1>
         {% csrf_token %}
         <div class="form-floating">
@@ -12,18 +12,16 @@
             <input type="password" class="form-control bottom" id="floatingPassword" placeholder="Password" name="password" required>
             <label for="floatingPassword">Password</label> 
         </div>
-        <div class="form-check text-start my-3">
-            <input class="form-check-input" type="checkbox" value="remember-me" id="checkDefault"> 
-            <label class="form-check-label" for="checkDefault">Remember me</label>
-        </div> 
+        <br>
         <button class="btn btn-primary w-100 py-2" type="submit" data-spinner-text="Logging in...">Log in</button>
+        <p class="mt-1 mb-1 text-body-secondary">Do not have an account? <a href="/account/register{%if next%}?next={{next}}{%endif%}">Create one</a></p>
         <p class="mt-5 mb-3 text-body-secondary">© 2025</p> 
     </form>
     <script>
         console.log("{{ error }}");
         document.getElementById("loginform").onsubmit = buildAjaxFormHandler(function(resp){
             //console.log(resp);
-            if(resp.status == 200) window.location.replace("/");
+            if(resp.status == 200) window.location.replace("{% if next %}{{next}}{% else %}/{%endif%}");
             else{
                 if(resp.content == "BADCREDENTIALS"){
                     spawnToast("danger", "exclamation-octagon-fill", "Invalid credentials. Please try again.");

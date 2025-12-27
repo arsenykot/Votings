@@ -8,5 +8,5 @@ class Voting(Model):
     description = CharField(max_length=100)
     option1 = CharField(max_length=20)
     option2 = CharField(max_length=20)
-    date_created = IntegerField()
-    date_closed = IntegerField()
+    date_created = DateTimeField(auto_now=True)
+    date_closed = DateTimeField(null=True, blank=True)

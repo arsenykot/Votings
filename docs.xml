@@ -6,7 +6,7 @@
         <title>Корень документации API</title>
         <file><path>auth</path>
             <title>Эндпоинты, связанные с автозирацией</title>
-            <endpoint><path>api/login</path>
+            <endpoint><path>api/auth/login</path>
                 <method>POST</method>
                 <desc>Попытаться войти в систему с указанным именем пользователя и паролем</desc>
                 <arg><name>username</name>
@@ -27,9 +27,56 @@
                     <when>Авторизация прошла успешно</when>
                 </resp>
             </endpoint>
-            <endpoint><path>api/logout</path>
+            <endpoint><path>api/auth/logout</path>
                 <method>GET / POST</method>
                 <desc>Выйти из аккаунта пользователя и перейти на главную страницу</desc>
+            </endpoint>
+        </file>
+        <file><path>registration</path>
+            <title>Эндпоинты, связанные с регистрацией</title>
+            <endpoint><path>api/registration/check_name</path>
+                <method>GET</method>
+                <desc>Проверяет, занято ли указанное имя</desc>
+                <arg><name>username</name>
+                    <type>str</type>
+                    <desc>Имя пользователя</desc>
+                </arg>
+                <resp><code>400</code><data>BADREQUEST</data>
+                    <when>Не указано имя пользователя</when>
+                </resp>
+                <resp><code>400</code><data>REGEX</data>
+                    <when>Имя пользователя содержит недопустимые символы</when>
+                </resp>
+                <resp><code>200</code><data>OK</data>
+                    <when>Указанное имя свободно</when>
+                </resp>
+                <resp><code>200</code><data>TAKEN</data>
+                    <when>Указанное имя занято</when>
+                </resp>
+            </endpoint>
+            <endpoint><path>api/registration/register</path>
+                <method>POST</method>
+                <desc>Создаёт аккаунт с указанным именем пользователя и паролем, затем авторизуется в него</desc>
+                <arg><name>username</name>
+                    <type>str[4..24]</type>
+                    <desc>Имя пользователя</desc>
+                </arg>
+                <arg><name>password</name>
+                    <type>str[8..]</type>
+                    <desc>Пароль</desc>
+                </arg>
+                <resp><code>400</code><data>BADREQUEST</data>
+                    <when>Недостаточно аргументов или формат аргументов некорректный</when>
+                </resp>
+                <resp><code>400</code><data>REGEX</data>
+                    <when>Имя пользователя содержит недопустимые символы</when>
+                </resp>
+                <resp><code>400</code><data>USERNAMETAKEN</data>
+                    <when>Имя пользователя занято</when>
+                </resp>
+                <resp><code>200</code><data>OK</data>
+                    <when>Аккаунт создан, авторизация выполнена</when>
+                </resp>
             </endpoint>
         </file>
     </folder>
@@ -69,7 +116,7 @@
             </method>
             <method><name>ajaxGet</name>
                 <desc>Алиас для `ajaxQuery`, где `method="GET"`</desc>
-                <argsor>endpoint, ready_callback, error_passthrough, httpheaders</argsor>
+                <argsor>endpoint, ready_callback, data, error_passthrough, httpheaders</argsor>
                 <ret>null</ret>
             </method>
             <method><name>ajaxPost</name>
@@ -131,6 +178,42 @@
                 </arg>
                 <ret>null</ret>
             </method>
+            <method><name>errorToast</name>
+                <desc>Создаёт toast с ошибкой, если код ошибки отличается от предыдущего созданного</desc>
+                <arg><name>error</name>
+                    <type>String</type>
+                    <desc>Внутреннее название ошибки. Используется для предотвращения спама ошибками</desc>
+                </arg>
+                <arg><name>text</name>
+                    <type>String</type>
+                    <desc>Текст ошибки</desc>
+                </arg>
+                <ret>null</ret>
+            </method>
+            <method><name>clearError</name>
+                <desc>Очищает последнюю созданную ошибку через errorToast</desc>
+                <ret>null</ret>
+            </method>
+        </file>
+        <file><path>formutils</path>
+            <title>Утилиты для работы с формами</title>
+            <desc>Предоставляет методы-утилиты для работы с формами. Функционал реализован в `/main/static/util.js` в регионе `formutils`</desc>
+            <method><name>validateForm</name>
+                <desc>Проверяет, валидны ли данные, введённые в форму</desc>
+                <arg><name>form</name>
+                    <type>HTMLFormElement</type>
+                    <desc>Форма</desc>
+                </arg>
+                <ret>bool</ret>
+            </method>
+            <method><name>validateFormInput</name>
+                <desc>Проверяет, валидны ли данные, введённые в поле ввода</desc>
+                <arg><name>input</name>
+                    <type>HTMLInputElement</type>
+                    <desc>Поле ввода</desc>
+                </arg>
+                <ret>bool</ret>
+            </method>
         </file>
     </folder>
     <folder><path>py</path>
@@ -142,8 +225,8 @@
             <title>Python-утилиты</title>
             <desc>Список Python-утилит</desc>
             <file><path>requests</path>
-                <title>Работа с запросами</title>
-                <desc>Утилиты для работы с запросами. Описано в [main.util](/main/util.py)</desc>
+                <title>Работа с запросами и ответами</title>
+                <desc>Утилиты для работы с запросами и ответами. Описано в [main.util](/main/util.py)</desc>
                 <method><name>getArgumentOr</name>
                     <desc>Возвращает значение аргумента в указанном массиве или стандартное значение при его отсутствии. Как правило имеет тип String</desc>
                     <arg><name>arr</name>
@@ -175,6 +258,18 @@
                     <argsor>req, name, default</argsor>
                     <ret>V(str)|Any</ret>
                 </method>
+                <method><name>respond</name>
+                    <desc>Подготавливает HTTPResponse с указанным статусом и данными</desc>
+                    <arg><name>status</name>
+                        <type>int</type>
+                        <desc>HTTP-статус ответа</desc>
+                    </arg>
+                    <arg><name>data</name>
+                        <type>str</type>
+                        <desc>Текст ответа</desc>
+                    </arg>
+                    <ret>HTTPResponse</ret>
+                </method>
             </file>
             <file><path>security</path>
                 <title>Безопасность</title>
@@ -189,6 +284,18 @@
                         <desc>Соль</desc>
                     </arg>
                     <ret>str[32]</ret>
+                </method>
+            </file>
+            <file><path>misc</path>
+                <title>Прочее</title>
+                <method><name>user_exists</name>
+                    <desc>Проверяет, существует ли пользователь с таким именем</desc>
+                    <arg>
+                        <name>username</name>
+                        <type>str</type>
+                        <desc>Имя пользователя</desc>
+                    </arg>
+                    <ret>bool</ret>
                 </method>
             </file>
         </folder>

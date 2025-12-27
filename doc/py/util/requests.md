@@ -1,7 +1,7 @@
-# Работа с запросами
+# Работа с запросами и ответами
 [Выше](/doc/py/util/index.md) | [Корень](/doc/index.md)
 
-Утилиты для работы с запросами. Описано в [main.util](/main/util.py)
+Утилиты для работы с запросами и ответами. Описано в [main.util](/main/util.py)
 
 ### `getArgumentOr(arr, name, default) -> V (str)|Any`
 Возвращает значение аргумента в указанном массиве или стандартное значение при его отсутствии. Как правило имеет тип String
@@ -21,5 +21,14 @@
 
 ### `getSessOr(req, name, default) -> V(str)|Any`
 Алиас для `getArgumentOr`, где `arr = req.session`
+
+### `respond(status, data) -> HTTPResponse`
+Подготавливает HTTPResponse с указанным статусом и данными
+|Параметр|Тип  |Описание          |
+|:-------|:----|:-----------------|
+|`status`|`int`|HTTP-статус ответа|
+|`data`  |`str`|Текст ответа      |
+
+
 
 _Автоматически сгенерировано [DocGen](/doc/doc/index.md)_

@@ -16,7 +16,7 @@
 
 
 
-### `ajaxGet(endpoint, ready_callback, error_passthrough, httpheaders) -> null`
+### `ajaxGet(endpoint, ready_callback, data, error_passthrough, httpheaders) -> null`
 Алиас для `ajaxQuery`, где `method="GET"`
 
 ### `ajaxPost(endpoint, ready_callback, data, error_passthrough, httpheaders) -> null`

@@ -1,45 +1,37 @@
 from django.http import HttpResponse
-from django.contrib.auth import authenticate, login, logout
 from main.util import *
 from main.models import *
-from time import time, sleep
-from django.shortcuts import redirect
+import json
+from datetime import date as dateobj, time as timeobj, datetime as dtobj
 
 def test_api_view(req):
-    return HttpResponse(str(req.user.is_authenticated))
-
-def auth_login_view(req):
-    #sleep(2)
-    uname = getPostOr(req, "username", False)
-    passwd = getPostOr(req, "password", False)
-    status = 200
-    text = "OK"
-    if uname == False or passwd == False:
-        status = 400
-        text = "BADREQUEST"
-    else:
-        user = authenticate(req, username=uname, password=passwd)
-        if user is None:
-            text = "BADCREDENTIALS"
-            status = 403
-        else:
-            login(req, user)
-    resp = HttpResponse(text)
-    resp.status_code = status
-    return resp
-
-def auth_logout_view(req):
-    if req.user.is_authenticated:
-        logout(req)
-    return redirect("/")
+    return HttpResponse(json.dumps({"POST": req.POST, "GET": req.GET}, indent=2, ensure_ascii=False))
 
 def voting_new_view(req):
+    if not req.user.is_authenticated:
+        return respond(401, "UNAUTHORIZED")
     name = getPostOr(req, "name", False)
-    desc = getPostOr(req, "description", False)
+    desc = getPostOr(req, "description", "")
     option1 = getPostOr(req, "option1", False)
     option2 = getPostOr(req, "option2", False)
     close = getPostOr(req, "close", False)
     date = getPostOr(req, "date", False)
     time = getPostOr(req, "time", False)
-    print(name, desc, option1, option2, close, date, time)
-    return HttpResponse("zov")
+
+    if False in [name, option1, option2, close]:
+        return respond(400, "BADREQUEST")
+    
+    if close == "auto" and False in [date, time]:
+        return respond(400, "BADREQUEST")
+    datetime = None
+    if close == "auto":
+        try:
+            date = dateobj.fromisoformat(date)
+            time = timeobj.fromisoformat(time)
+            datetime = dtobj.combine(date, time)
+        except ValueError:
+            return respond(400, "BADDATE")
+    
+    voting = Voting(author=req.user, name=name, description=desc, option1=option1, option2=option2, date_closed=datetime)
+    voting.save()
+    return HttpResponse("OK")

@@ -22,10 +22,10 @@
             <label for="floatingOption2">Option 2</label> 
         </div>
         <div class="form-check text-start my-3">
-            <input class="form-check-input close" type="radio" id="close1" name="close" checked=true>
+            <input class="form-check-input close" type="radio" id="close1" name="close" checked=true value="auto">
             <label class="form-check-label" for="close2">Automatically close the voting</label>
             <br>
-            <input class="form-check-input close" type="radio" id="close2" name="close"> 
+            <input class="form-check-input close" type="radio" id="close2" name="close" value="manual"> 
             <label class="form-check-label" for="close2">Close the voting manually</label>
         </div>
         <div class="form-small" id="datetimeForm">
@@ -39,41 +39,37 @@
     </form>
     <script>
         document.getElementById("newform").onsubmit = buildAjaxFormHandler(function(resp){
-            //console.log(resp);
-            if(resp.status == 200) pass;
+            if(resp.status == 200){
+                spawnToast("success", "info-circle-fill", "Voting successfully created!")
+            }
             else{
-                if(resp.content == "BADCREDENTIALS"){
-                    spawnToast("danger", "exclamation-octagon-fill", "Invalid credentials. Please try again.");
+                switch(resp.content){
+                    case "UNAUTHORIZED":
+                    errorToast(false, "Authorization failure. Try refreshing the page.");
+                    break;
+                    case "BADREQUEST":
+                    errorToast(false, "Invalid data specified.");
+                    break;
+                    case "BADDATE":
+                    errorToast(false, "Invalid date format.");
+                    break;
+                    default:
+                    errorToast(false, "Unexpected error. Check console for more info.");
+                    console.error(resp);
+                    break;
                 }
             }
         });
-
         const radio1 = document.getElementById("close1");
         const datetime1 = document.getElementById("datetime1");
         const radio2 = document.getElementById("close2");
         const datetime2 = document.getElementById("datetime2");
-        radio1.addEventListener("input", (event) => {
-            console.log("event");
-            if(document.getElementById("close1").checked){
-                datetime1.disabled=false;
-                datetime2.disabled=false;
-            }
-            else {
-                datetime1.disabled=true;
-                datetime2.disabled=true;
-            }
-        });
-        radio2.addEventListener("input", (event) => {
-            console.log("event");
-            if(document.getElementById("close1").checked){
-                datetime1.disabled=false;
-                datetime2.disabled=false;
-            }
-            else {
-                datetime1.disabled=true;
-                datetime2.disabled=true;
-            }
-        });
+        function radioUpdate(e){
+            datetime1.disabled=!document.getElementById("close1").checked;
+            datetime2.disabled=datetime1.disabled;
+        }
+        radio1.addEventListener("input", radioUpdate);
+        radio2.addEventListener("input", radioUpdate);
     </script>
 </div>
 {% endblock %}
