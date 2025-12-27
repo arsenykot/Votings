@@ -63,7 +63,7 @@ function ajaxQuery(endpoint, method, ready_callback, data = null, error_passthro
         }
         else{
             console.error(e);
-            spawnToast("danger", "exclamation-ocatgon-fill", "Something went wrong. Check console for more details.");
+            spawnToast("danger", "exclamation-octagon-fill", "Something went wrong. Check console for more details.");
         }
     };
     queryXHR.addEventListener("readystatechange", function(e){
