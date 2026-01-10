@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import auth
 from django.http import HttpResponse
+from main.models import Voting
 
 def index_page_view(req):
    return render(req, "index.html")
@@ -32,3 +33,15 @@ def register_page_view(req):
 
 def profile_page_view(req):
     return render(req, "account/profile.html")
+
+def existing_voting_view(req, id:int):
+    voting = Voting.objects.filter(id=id)
+    if len(voting) <= 0:
+        return render(req, "votings/error/not_found.html", status=404)
+    voting = voting[0]
+    return render(req, "votings/view.html", {
+        "title": voting.name,
+        "description": voting.description,
+        "options": [(0, voting.option1), (1, voting.option2)], # заглушка
+        "author": voting.author
+    })

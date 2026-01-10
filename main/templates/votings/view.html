@@ -1,0 +1,59 @@
+{% extends "abc/with_sidebar.html" %}
+{% block title %}Simple Votings - "{{title}}"{% endblock %}
+{% block content %}
+{% comment %} <div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">
+            <i class="bi bi-file-earmark-fill"></i>
+            {{title}}
+        </h1>
+        <ul>
+            <li class="text-secondary"></li>
+            <li class="text-danger"><i class="bi bi-flag-fill"></i> <a class="text-reset" href="/voting/report/{{id}}">Report this voting</a></li>
+        </ul>
+        <h4>
+            {{description}}
+        </h4>
+    </div>
+</div> {% endcomment %}
+<div class="row">
+    <div class="col-md-8 col-lg-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-list-check"></i>
+                    {{title}}
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <p>
+                        {{description}}
+                    </p>
+                </div>
+                <hr>
+                <div class="mb-3">
+                    <form action="/api/voting/vote/{{id}}/" method="POST" id="voteform">
+                        {% csrf_token %}
+                        {% for id, option in options %}
+                        <label><input type="radio" name="option" value="{{id}}"> {{option}}</label>
+                        <br>
+                        {% endfor %}
+                        <br>
+                        <button type="submit" data-spinner-text="Submitting your vote..." class="btn btn-primary">Vote</button>
+                    </form>
+                </div>
+                <script>
+                    document.getElementById("voteform").onsubmit = buildAjaxFormHandler(function(resp){
+                        console.log(resp);
+                    });
+                </script>
+            </div>
+            <div class="card-footer">
+                <p class="text-secondary-emphasis"><i class="bi bi-person-fill"></i> Created by <a href="/user/{{author.id}}" class="text-reset" target="_blank">{{author.username}}</a></p>
+                <a class="text-danger text-decoration-none" href="/votings/report/{{id}}" target="_blank"><i class="bi bi-flag-fill"></i> Report</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -5,7 +5,7 @@
         <div id="sidebar-container" class="w-15 position-fixed start-0 h-100 sidebar-container d-flex" style="width: 15%;">
             {% block sidebar-override %}
             <div class="d-flex flex-column flex-shrink-0 p-3 bg-body-tertiary start-0 top-0 w-100" id="sidebar" style="min-width: 280px;">
-                <h2>Simple Votings</h2>
+                <h2><a class="text-reset text-decoration-none" href="/">Simple Votings</a></h2>
                 <hr>
                 <ul class="nav nav-pills flex-column mb-auto">
                     <li class="nav-item">
@@ -68,8 +68,10 @@
         </div>
     </div>
     <div class="w-85 mw-100 ms-3 d-flex flex-column end-0 overflow-y-scroll object-fit-fill" style="min-width: 100px; width: 85%;">
-        {% block content %}
-        {% endblock %}
+        <div class="container-fluid p-4">
+            {% block content %}
+            {% endblock %}
+        </div>
     </div>
     <div id="toast-container">
     </div>

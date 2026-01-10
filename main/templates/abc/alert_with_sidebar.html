@@ -1,0 +1,13 @@
+{% extends "abc/with_sidebar.html" %}
+{% block title %}Simple Votings{% endblock %}
+{% block content %}
+<h1>{% block alert_title %}<i class="bi-exclamation-octagon-fill"></i> Test alert</h1>{% endblock %}
+<br>
+{% block alert_content %}
+<h3>Sample alert line 1</h3>
+<h3>Sample alert line 2</h3>
+{% endblock %}
+{% block alert_links %}
+<h4><a href="/">Return to main page</a></h4>
+{% endblock %}
+{% endblock %}
