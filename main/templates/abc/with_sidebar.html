@@ -27,18 +27,23 @@
                         {% if request.user.is_authenticated %}
                         {% if user.is_superuser %}
                         <li class="nav-item">
-                            <a href="/admin/users" class="nav-link  text-danger-emphasis">
+                            <a href="/admin/main/user" class="nav-link link-body-emphasis"> <!-- заглушка -->
                                 <i class="bi bi-person-circle"></i>
                                 Manage users
                             </a>
                         </li>
-                        <hr>
                         {% endif %}
                         {% if user.is_staff %}
                         <li class="nav-item">
-                            <a href="/admin/users" class="nav-link  text-danger-emphasis">
+                            <a href="/admin/main/voting" class="nav-link link-body-emphasis"> <!-- заглушка -->
+                                <i class="bi bi-list-check"></i>
+                                Manage votings
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/admin/reports" class="nav-link link-body-emphasis"> <!-- заглушка -->
                                 <i class="bi bi-flag-fill"></i>
-                                Check reports
+                                See user reports
                             </a>
                         </li>
                         <hr>

@@ -13,4 +13,5 @@ class Voting(Model):
     multichoice = BooleanField(default=False)
     date_created = DateTimeField(auto_now=True)
     date_closed = DateTimeField(null=True, blank=True)
+    taken_down = BooleanField(default=False)
 

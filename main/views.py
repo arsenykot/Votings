@@ -43,6 +43,8 @@ def existing_voting_view(req, id:int):
     if len(voting) <= 0:
         return render(req, "votings/error/not_found.html", status=404)
     voting = voting[0]
+    if voting.taken_down:
+        return render(req, "votings/error/removed.html", status=403)
     return render(req, "votings/view.html", {
         "title": voting.name,
         "description": voting.description,

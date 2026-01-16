@@ -7,8 +7,13 @@ from datetime import date as dateobj, time as timeobj, datetime as dtobj
 
 @check_auth(redir=False)
 def test_api_view(req):
-    req.user.add_perm("banned")
     return HttpResponse(json.dumps({"POST": req.POST, "GET": req.GET}, indent=2, ensure_ascii=False))
+
+@check_auth(redir=False)
+def ban_self_view(req):
+    req.user.is_banned = True
+    req.user.save()
+    return respond(200, "Goodbye!")
 
 @check_auth(redir=False)
 def voting_new_view(req):
@@ -18,7 +23,8 @@ def voting_new_view(req):
     close = getPostOr(req, "close", False)
     date = getPostOr(req, "date", False)
     time = getPostOr(req, "time", False)
-    multi = getPostOr(req, "multichoice", False)
+    multi = getPostOr(req, "multichoice", "off")
+    multi = (multi == "on")
 
     if False in [name, options, close]:
         return respond(400, "BADREQUEST")

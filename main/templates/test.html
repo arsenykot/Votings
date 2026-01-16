@@ -32,7 +32,14 @@
     {% partial tests_view %}
     {% endwith %}
 </ol>
+<a class="btn btn-danger" href="javascript:banself();">Ban self</a>
 <script>
+function banself(){
+    ajaxGet("/api/ban_self", function(resp){
+        if(resp.status == 200) spawnToast("success", "info", resp.content);
+        else spawnToast("danger", "exclamation-octagon-fill", resp.content);
+    }, null);
+}
 let testButton = document.getElementById("test-button");
 testButton.addEventListener("click",function(e){
     setSpinner(testButton, "Loading error...");
