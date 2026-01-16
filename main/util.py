@@ -1,7 +1,8 @@
 from hashlib import sha256
 from time import time
-from django.contrib.auth.models import User
+from main.models import User
 from django.http import HttpResponse
+from django.shortcuts import redirect
 import re
 
 USERNAME_RE_MATCH = re.compile(r"^([a-z0-9\.]{4,24})$")
@@ -90,3 +91,22 @@ def checkVars(data_list):
                         return False
         
     return True
+
+def check_auth(auth = True, bans = True, redir = True):
+    def decorator(func):
+        def wrap(*args, **kwargs):
+            req = args[0]
+            if auth and not req.user.is_authenticated:
+                if redir:
+                    return redirect("/account/login")
+                else:
+                    return respond(401, "UNAUTHORIZED")
+            if req.user.is_authenticated:
+                if bans and req.user.is_banned:
+                    if redir:
+                        return redirect("/account/banned")
+                    else:
+                        return respond(403, "FORBIDDEN")
+            return func(*args, **kwargs)
+        return wrap
+    return decorator

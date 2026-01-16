@@ -1,5 +1,4 @@
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.models import User
 from time import time, sleep
 from django.shortcuts import redirect
 from main.util import *

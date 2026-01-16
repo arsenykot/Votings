@@ -25,6 +25,24 @@
                 <div>
                     <ul class="nav nav-pills flex-column mb-auto">
                         {% if request.user.is_authenticated %}
+                        {% if user.is_superuser %}
+                        <li class="nav-item">
+                            <a href="/admin/users" class="nav-link  text-danger-emphasis">
+                                <i class="bi bi-person-circle"></i>
+                                Manage users
+                            </a>
+                        </li>
+                        <hr>
+                        {% endif %}
+                        {% if user.is_staff %}
+                        <li class="nav-item">
+                            <a href="/admin/users" class="nav-link  text-danger-emphasis">
+                                <i class="bi bi-flag-fill"></i>
+                                Check reports
+                            </a>
+                        </li>
+                        <hr>
+                        {% endif %}
                         <li class="nav-item">
                             <a href="/account/profile" class="nav-link link-body-emphasis">
                                 <i class="bi bi-person-circle"></i>

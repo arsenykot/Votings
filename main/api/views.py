@@ -5,12 +5,13 @@ import json
 import base64
 from datetime import date as dateobj, time as timeobj, datetime as dtobj
 
+@check_auth(redir=False)
 def test_api_view(req):
+    req.user.add_perm("banned")
     return HttpResponse(json.dumps({"POST": req.POST, "GET": req.GET}, indent=2, ensure_ascii=False))
 
+@check_auth(redir=False)
 def voting_new_view(req):
-    if not req.user.is_authenticated:
-        return respond(401, "UNAUTHORIZED")
     name = getPostOr(req, "name", False)
     desc = getPostOr(req, "description", "")
     options = getPostOr(req, "options", False)
@@ -58,7 +59,6 @@ def voting_new_view(req):
     voting.save()
     return HttpResponse(str(voting.id))
 
+@check_auth(redir=False)
 def voting_vote_view(req, id:int):
-    if not req.user.is_authenticated:
-        return respond(401, "UNAUTHORIZED")
     pass

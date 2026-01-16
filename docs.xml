@@ -389,6 +389,22 @@
                     </arg>
                     <ret>bool</ret>
                 </method>
+                <method><name>@check_auth</name>
+                    <desc>Декоратор для быстрой проверки прав доступа</desc>
+                    <arg><name>auth</name>
+                        <type>bool?</type>
+                        <desc>Проверять ли то, вошёл ли пользователь в систему? По умолчанию - True</desc>
+                    </arg>
+                    <arg><name>bans</name>
+                        <type>bool?</type>
+                        <desc>Проверять ли то, заблокирован ли аккаунт пользователя? По умолчанию - True</desc>
+                    </arg>
+                    <arg><name>redir</name>
+                        <type>bool?</type>
+                        <desc>Переадресовать(True) или вернуть API-ответ(False) при провале проверок. По умолчанию - True</desc>
+                    </arg>
+                    <ret>Func</ret>
+                </method>
             </file>
         </folder>
     </folder>
