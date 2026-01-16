@@ -21,6 +21,15 @@ def voting_new_view(req):
     if False in [name, option1, option2, close]:
         return respond(400, "BADREQUEST")
     
+    if not checkVars([
+        [str, name, 1, 48],
+        [str, desc, 0, 512],
+        [str, option1, 1, 48],
+        [str, option2, 0, 48],
+        [["auto", "manual"], close]
+    ]):
+        return respond(400, "BADREQUEST")
+    
     if close == "auto" and False in [date, time]:
         return respond(400, "BADREQUEST")
     datetime = None

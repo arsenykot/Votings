@@ -42,3 +42,51 @@ def containsAny(haystack, needles):
         if needle in haystack:
             return True
     return False
+
+def checkVars(data_list):
+    for entry in data_list:
+        val = None
+        min = None
+        max = None
+        valid_items = None
+
+        if type(entry[0]) is list:
+            valid_items = entry[0]
+            val = type(valid_items[0])(entry[1])
+        else:
+            try:
+                val = entry[0](entry[1])
+            except:
+                return False
+        
+        if len(entry) > 2:
+            min = entry[2]
+        else:
+            min = -1
+        
+        if len(entry) > 3:
+            max = entry[3]
+        
+        if valid_items != None:
+            if not val in valid_items:
+                return False
+        
+        if entry[0] == int or entry[0] == float:
+            if max == None:
+                max = val
+            if valid_items == None:
+                if not (min <= val <= max):
+                    return False
+        
+        elif entry[0] == str:
+            if max == None:
+                max = len(val)
+            
+            if valid_items == None:
+                if not (min <= len(val) <= max):
+                    return False
+                if len(entry) > 4:
+                    if not re.match(entry[4], val):
+                        return False
+        
+    return True

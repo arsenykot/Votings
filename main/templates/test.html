@@ -1,0 +1,51 @@
+{% extends "abc/with_sidebar.html" %}
+{% partialdef tests_view %}
+{% for test in tests %}
+<li class="mb-0 mt-0"><p class="mb-0 mt-0">{{ test.0 }}: {% if test.1 %}<span class="text-success">PASS</span>{% else %}<span class="text-danger">FAIL</span>{% endif %}</p></li>
+{% endfor %}
+{% endpartialdef %}
+{% block content %}
+<button class="btn btn-primary" id="test-button" style="max-width: 30vw;">test spinner and toast</button>
+<br>
+<h1>Form controls test</h1>
+<form action="/api/test" id="controltest">
+    {% csrf_token %}
+    <select name="select_test">
+        <option value="value 1">value 1</option>
+        <option value="value 2 works">value 2</option>
+    </select>
+    <textarea name="textarea_test">textarea works
+    </textarea>
+    <label><input type="radio" name="radio_test" value="option 1" checked> radio 1 option 1</label>
+    <label><input type="radio" name="radio_test" value="option 2"> radio 1 option 2</label>
+    <label><input type="radio" name="radio2_test" value="option 1"> radio 2 option 1</label>
+    <label><input type="radio" name="radio2_test" value="option 2" checked> radio 2 option 2</label>
+    <button type="submit">Submit</button>
+</form>
+<a class="btn btn-primary" data-bs-toggle="collapse" href="#" data-bs-target="#cvTestsCollapse" role="button" aria-expanded="false" aria-controls="cvTestsCollapse">
+    open checkVars tests
+</a>
+<ol class="collapse" id="cvTestsCollapse">
+    {% with tests=checkvars_tests %}
+    {% partial tests_view %}
+    {% endwith %}
+</ol>
+<script>
+let testButton = document.getElementById("test-button");
+testButton.addEventListener("click",function(e){
+    setSpinner(testButton, "Loading error...");
+    testButton.disabled = true;
+    setTimeout(function(){
+        spawnToast("danger", "exclamation-octagon-fill", "Something went terribly wrong.");
+        testButton.disabled = false;
+        testButton.innerText = "test spinner and toast";
+    }, 1000);
+});
+controltest.onsubmit = buildAjaxFormHandler(function(resp){
+    console.log(resp);
+    if(resp.status==200){
+        alert(resp.content);
+    }
+});
+</script>
+{% endblock %}

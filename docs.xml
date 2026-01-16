@@ -85,19 +85,19 @@
                 <method>POST</method>
                 <desc>Создаёт голосование</desc>
                 <arg><name>name</name>
-                    <type>String[1..20]</type>
+                    <type>String[1..48]</type>
                     <desc>Название голосования</desc>
                 </arg>
                 <arg><name>description</name>
-                    <type>String[1..100]?</type>
+                    <type>String[1..512]?</type>
                     <desc>Описание голосования</desc>
                 </arg>
                 <arg><name>option1</name>
-                    <type>String[1..20]</type>
+                    <type>String[1..48]</type>
                     <desc>Опция 1 (в дальнейшем будет переработано)</desc>
                 </arg>
                 <arg><name>option2</name>
-                    <type>String[1..20]</type>
+                    <type>String[1..48]</type>
                     <desc>Опция 2 (в дальнейшем будет переработано)</desc>
                 </arg>
                 <arg><name>close</name>
@@ -317,6 +317,23 @@
                     </arg>
                     <ret>HTTPResponse</ret>
                 </method>
+                <method><name>checkVars</name>
+                    <desc>Используется для проверки переменных (изначально GET, POST параметров) на соответствие ограничениям. Возвращает `True` в случае прохождения проверки всеми элементами, `False` в любом другом случае</desc>
+                    <arg><name>var_list</name>
+                        <type>list[var_def]</type>
+                        <desc>Список var_def для проверки переменных (см. фиктивный тип var_def ниже)</desc>
+                    </arg>
+                    <ret>bool</ret>
+                </method>
+                <table><name>Фиктивный тип var_def</name>
+                    <header>Индекс;Тип/Значения;Описание</header>
+                    <row>0;`str|int|float|list`;Тип переменной для проверки ИЛИ список валидных значений</row>
+                    <row>1;`any(str)`;Переменная для проверки</row>
+                    <row>2;`int|float`;Минимальное значение int/float, минимальная длина строки</row>
+                    <row>3;`int|float`;Максимальное значение int/float, максимальная длина строки</row>
+                    <row>4;`re.Pattern|str`;REGEX-выражение для проверки строки (только когда 0 == `str`)</row>
+                    <row>Пример;;`[str, var, 1, 20, USERNAME_RE_MATCH]` - указывет: `var` - строка от 1 до 20 символов соответствующаяя выражению `util.USERNAME_RE_MATCH`</row>
+                </table>
             </file>
             <file><path>security</path>
                 <title>Безопасность</title>

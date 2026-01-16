@@ -6,6 +6,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include("main.api.urls")),
     path('', index_page_view),
+    path('tos', tos_page_view),
+    path('test', test_page_view),
     path('account/login', login_page_view),
     path('votings/new', new_voting_view),
 #    path('votings/list', voting_list_view),
