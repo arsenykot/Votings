@@ -27,7 +27,7 @@
                         {% if request.user.is_authenticated %}
                         {% if user.is_superuser %}
                         <li class="nav-item">
-                            <a href="/admin/main/user" class="nav-link link-body-emphasis"> <!-- заглушка -->
+                            <a href="/staff/users" class="nav-link link-body-emphasis">
                                 <i class="bi bi-person-circle"></i>
                                 Manage users
                             </a>
@@ -35,13 +35,13 @@
                         {% endif %}
                         {% if user.is_staff %}
                         <li class="nav-item">
-                            <a href="/admin/main/voting" class="nav-link link-body-emphasis"> <!-- заглушка -->
+                            <a href="/staff/votings" class="nav-link link-body-emphasis">
                                 <i class="bi bi-list-check"></i>
                                 Manage votings
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="/admin/reports" class="nav-link link-body-emphasis"> <!-- заглушка -->
+                            <a href="/staff/reports" class="nav-link link-body-emphasis">
                                 <i class="bi bi-flag-fill"></i>
                                 See user reports
                             </a>

@@ -3,8 +3,9 @@ from django.urls import path, include
 from main.views import *
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    # path('admin/', admin.site.urls),
     path('api/', include("main.api.urls")),
+    path('staff/', include("main.staffportal.urls")),
     path('', index_page_view),
     path('tos', tos_page_view),
     path('test', test_page_view),

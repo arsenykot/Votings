@@ -1,7 +1,6 @@
 from main.util import *
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from django.contrib import auth
 from django.http import HttpResponse
 from main.models import *
 
@@ -21,7 +20,7 @@ def login_page_view(req):
     })
 
 
-@check_auth()
+@login_required(login_url="/account/login?error=new")
 def new_voting_view(req):
     return render(req, "votings/new.html", {})
 
