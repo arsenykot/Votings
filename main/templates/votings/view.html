@@ -1,21 +1,6 @@
 {% extends "abc/with_sidebar.html" %}
 {% block title %}Simple Votings - "{{title}}"{% endblock %}
 {% block content %}
-{% comment %} <div class="row">
-    <div class="col-12">
-        <h1 class="mb-4">
-            <i class="bi bi-file-earmark-fill"></i>
-            {{title}}
-        </h1>
-        <ul>
-            <li class="text-secondary"></li>
-            <li class="text-danger"><i class="bi bi-flag-fill"></i> <a class="text-reset" href="/voting/report/{{id}}">Report this voting</a></li>
-        </ul>
-        <h4>
-            {{description}}
-        </h4>
-    </div>
-</div> {% endcomment %}
 <div class="row">
     <div class="col-md-8 col-lg-6">
         <div class="card mb-4">
@@ -40,7 +25,7 @@
                         <br>
                         {% endfor %}
                         <br>
-                        <button type="submit" data-spinner-text="Submitting your vote..." class="btn btn-primary">Vote</button>
+                        <button type="submit" data-spinner-text="Submitting your vote..." class="btn btn-primary">{% if voted %}Change vote{%else%}Vote{%endif%}</button>
                     </form>
                 </div>
                 <script>

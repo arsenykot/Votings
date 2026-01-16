@@ -43,7 +43,8 @@ def existing_voting_view(req, id:int):
         "title": voting.name,
         "description": voting.description,
         "options": [(0, voting.option1), (1, voting.option2)], # заглушка
-        "author": voting.author
+        "author": voting.author,
+        "id": id
     })
 
 def tos_page_view(req):
