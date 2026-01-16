@@ -42,7 +42,8 @@ def existing_voting_view(req, id:int):
     return render(req, "votings/view.html", {
         "title": voting.name,
         "description": voting.description,
-        "options": [(0, voting.option1), (1, voting.option2)], # заглушка
+        "options": list(enumerate(voting.options)),
+        "multichoice": voting.multichoice,
         "author": voting.author,
         "id": id
     })
@@ -88,3 +89,11 @@ def test_page_view(req):
     for test in checkvars_tests:
         test[1] = (checkVars([test[1]]) == test[2])
     return render(req, "test.html", {"checkvars_tests": checkvars_tests})
+
+@login_required(login_url="/account/login")
+def account_settings_view(req):
+    return render(req, "account/settings.html", {})
+
+@login_required(login_url="/account/login")
+def account_sessions_view(req):
+    return render(req, "account/sessions.html", {})

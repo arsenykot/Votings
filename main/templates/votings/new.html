@@ -1,77 +1,137 @@
-{% extends "abc/base.html" %}
+{% extends "abc/with_sidebar.html" %}
 {% block content %}
-<div style="display: flex; align-items: center; justify-content: center; height: 100%; width: 100%;">
-    <form style="width: 400px; padding: 1rem;" id="newform" action="/api/new">
+<div class="row">
+    <form id="newform" action="/api/new">
         <h1 class="h3 mb-3 fw-normal">Create a voting</h1>
         {% csrf_token %}
-        <div class="form-floating">
-            <input type="text" class="form-control" id="floatingName" placeholder="Name" maxlength="48" name="name" required>
-            <label for="floatingName">Name</label>
-        </div><br>
-        <div class="form-floating">
-            <textarea class="form-control txtarea" id="floatingDescription" placeholder="Description" maxlength="512" name="description"
-            rows=4 form="newform"></textarea>
-            <label for="floatingDescription">Description</label>
-        </div><br>
-        <div class="form-floating">
-            <input type="text" class="form-control top" id="floatingOption1" placeholder="Option 1" maxlength="48" name="option1" required>
-            <label for="floatingOption1">Option 1</label>
+        <div class="col-md-8 col-lg-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <input type="text" class="form-control" placeholder="Voting name (required)" maxlength="48" name="name" required>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <textarea class="form-control txtarea" id="floatingDescription" placeholder="Voting description (optional)" maxlength="512" name="description" rows=4 form="newform"></textarea>
+                    </div>
+                    <hr>
+                    <h5>Voting options</h5>
+                    <input name="options" type="text" id="optionscontainer" hidden>
+                    <ol class="mb-3" id="optionbuilder">
+                    </ol>
+                    <a href="javascript:optionBuilderNew()" class="btn btn-primary" id="addnewoption"><i class="bi bi-plus"></i>Add option</a>
+                    <br><br>
+                    <label><input type="checkbox" class="form-check-input close" name="multichoice" value="yes"> Allow multiple options to be selected</label>
+                    <hr>
+                    <h5>Voting closing</h5>
+                    <div class="form-check text-start my-3">
+                        <input class="form-check-input close" type="radio" id="close1" name="close" checked=true value="auto">
+                        <label class="form-check-label" for="close1">Automatically close the voting</label>
+                        <br>
+                        <input class="form-check-input close" type="radio" id="close2" name="close" value="manual"> 
+                        <label class="form-check-label" for="close2">Close the voting manually</label>
+                    </div>
+                    <div class="form-small" id="datetimeForm">
+                        <input class="form-control top datetime" type="date" id="datetime1" name="date">
+                        <input class="form-control bottom datetime" type="time" id="datetime2" name = "time">
+                    </div>
+                    <hr>
+                    <i>By creating any content on this website, you agree with the <a href="/tos">Terms of Service</a>.</i>
+                    <br><br>
+                    <button type="submit" data-spinner-text="Creating..." class="btn btn-primary">Create voting</button>
+                    <script>
+                        let optionBuilder = document.getElementById("optionbuilder");
+                        let optionContainer = document.getElementById("optionscontainer");
+                        let optionElements = [];
+                        function rebuildOptions(){
+                            let options = [];
+                            optionElements.forEach(option => {
+                                options.push(option.children[0].value);
+                            });
+                            optionContainer.value = b64enc(JSON.stringify(options));
+                        }
+                        function optionBuilderEdit(e){
+                            rebuildOptions();
+                        }
+                        function updateOptionBuilderButton(){
+                            let button = document.getElementById("addnewoption");
+                            if(optionElements.length >= 10) button.classList.add("disabled");
+                            else button.classList.remove("disabled");
+                        }
+                        function optionBuilderNew(){
+                            let element = document.createElement("li");
+                            let nameEdit = document.createElement("input");
+                            nameEdit.type = "text";
+                            nameEdit.placeholder = "Option text";
+                            nameEdit.addEventListener("change", optionBuilderEdit);
+                            element.appendChild(nameEdit);
+                            let removeButton = document.createElement("a");
+                            removeButton.classList.add("text-danger");
+                            removeButton.href="#";
+                            removeButton.innerHTML = "<i class='bi bi-trash-fill'></i>";
+                            removeButton.addEventListener("click", optionBuilderDelete);
+                            element.appendChild(removeButton);
+                            element.classList.add("mb-1");
+                            optionBuilder.append(element);
+                            optionElements.push(element);
+                            updateOptionBuilderButton();
+                            rebuildOptions();
+                        }
+                        function optionBuilderDelete(e){
+                            let element = e.target.parentElement.parentElement;
+                            optionElements.pop(optionElements.indexOf(element));
+                            element.remove();
+                            updateOptionBuilderButton();
+                            rebuildOptions();
+                            if(optionElements.length < 2) errorToast(false, "Too few options. Please create at least 2.");
+                        }
+                        document.getElementById("newform").onsubmit = buildAjaxFormHandler(function(resp){
+                        if(resp.status == 200){
+                            spawnToast("success", "info-circle-fill", "Voting successfully created!");
+                            window.location.replace("/votings/view/"+resp.content);
+                        }
+                        else{
+                            switch(resp.content){
+                                case "UNAUTHORIZED":
+                                    errorToast(false, "Authorization failure. Try refreshing the page.");
+                                    break;
+                                case "BADREQUEST":
+                                    errorToast(false, "Invalid data specified.");
+                                    break;
+                                case "TOOMANYOPTIONS":
+                                    errorToast(false, "Too many options specified.");
+                                    break;
+                                case "TOOFEWOPTIONS":
+                                    errorToast(false, "Too few options specified.");
+                                    break;
+                                case "BADDATE":
+                                    errorToast(false, "Invalid date format.");
+                                    break;
+                                case "DATEINPAST":
+                                    errorToast(false, "The date you specified is in the past.");
+                                    break;
+                                default:
+                                    errorToast(false, "Unexpected error. Check console for more info.");
+                                    console.error(resp);
+                                    break;
+                            }
+                        }
+                    });
+                    const radio1 = document.getElementById("close1");
+                    const datetime1 = document.getElementById("datetime1");
+                    const radio2 = document.getElementById("close2");
+                    const datetime2 = document.getElementById("datetime2");
+                    function radioUpdate(e){
+                        datetime1.disabled=!document.getElementById("close1").checked;
+                        datetime2.disabled=datetime1.disabled;
+                    }
+                    radio1.addEventListener("input", radioUpdate);
+                    radio2.addEventListener("input", radioUpdate);
+                    for(let i = 0; i < 2; i++) optionBuilderNew();
+                </script>
+            </div>
         </div>
-        <div class="form-floating">
-            <input type="text" class="form-control bottom" id="floatingOption2" placeholder="Option 2" maxlength="48" name="option2" required>
-            <label for="floatingOption2">Option 2</label> 
-        </div>
-        <div class="form-check text-start my-3">
-            <input class="form-check-input close" type="radio" id="close1" name="close" checked=true value="auto">
-            <label class="form-check-label" for="close2">Automatically close the voting</label>
-            <br>
-            <input class="form-check-input close" type="radio" id="close2" name="close" value="manual"> 
-            <label class="form-check-label" for="close2">Close the voting manually</label>
-        </div>
-        <div class="form-small" id="datetimeForm">
-            <input class="form-control top datetime" type="date" id="datetime1" name="date">
-            <input class="form-control bottom datetime" type="time" id="datetime2" name = "time">
-        </div>
-        <label for="datetimeForm">Choose automatic close date</label>
-        <br><br>
-        <i>By creating any content on this website, you agree with the <a href="/tos">Terms of Service</a>.</i>
-        <br><br>
-        <button class="btn btn-primary w-100 py-2" type="submit" data-spinner-text="Creating...">Create</button>
-        <p class="mt-5 mb-3 text-body-secondary">© 2025</p> 
     </form>
-    <script>
-        document.getElementById("newform").onsubmit = buildAjaxFormHandler(function(resp){
-            if(resp.status == 200){
-                spawnToast("success", "info-circle-fill", "Voting successfully created!")
-            }
-            else{
-                switch(resp.content){
-                    case "UNAUTHORIZED":
-                    errorToast(false, "Authorization failure. Try refreshing the page.");
-                    break;
-                    case "BADREQUEST":
-                    errorToast(false, "Invalid data specified.");
-                    break;
-                    case "BADDATE":
-                    errorToast(false, "Invalid date format.");
-                    break;
-                    default:
-                    errorToast(false, "Unexpected error. Check console for more info.");
-                    console.error(resp);
-                    break;
-                }
-            }
-        });
-        const radio1 = document.getElementById("close1");
-        const datetime1 = document.getElementById("datetime1");
-        const radio2 = document.getElementById("close2");
-        const datetime2 = document.getElementById("datetime2");
-        function radioUpdate(e){
-            datetime1.disabled=!document.getElementById("close1").checked;
-            datetime2.disabled=datetime1.disabled;
-        }
-        radio1.addEventListener("input", radioUpdate);
-        radio2.addEventListener("input", radioUpdate);
-    </script>
 </div>
 {% endblock %}

@@ -9,6 +9,8 @@ urlpatterns = [
     path('tos', tos_page_view),
     path('test', test_page_view),
     path('account/login', login_page_view),
+    path('account/settings', account_settings_view),
+    path('account/sessions', account_sessions_view),
     path('votings/new', new_voting_view),
 #    path('votings/list', voting_list_view),
     path('votings/view/<int:id>', existing_voting_view),

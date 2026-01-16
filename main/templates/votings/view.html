@@ -18,27 +18,53 @@
                 </div>
                 <hr>
                 <div class="mb-3">
-                    <form action="/api/voting/vote/{{id}}/" method="POST" id="voteform">
+                    <form action="/api/voting/vote/{{id}}" method="POST" id="voteform">
                         {% csrf_token %}
+                        {% if multichoice %}
+                        <input type="text" name="option" id="multichoiceoptions" hidden>
+                        {%endif%}
                         {% for id, option in options %}
-                        <label><input type="radio" name="option" value="{{id}}"> {{option}}</label>
+                        {% if multichoice %}
+                        <label><input type="checkbox" class="form-check-input close" onclick="javascript:rebuildOptionSelection();" value="{{id}}"> {{option}}</label>
+                        {% else %}
+                        <label><input type="radio" class="form-check-input close" name="option" value="{{id}}"> {{option}}</label>
+                        {% endif %}
                         <br>
                         {% endfor %}
                         <br>
+                        {% if user.is_authenticated and author == user %}
+                        {% elif user.is_authenticated %}
                         <button type="submit" data-spinner-text="Submitting your vote..." class="btn btn-primary">{% if voted %}Change vote{%else%}Vote{%endif%}</button>
+                        {% else %}
+                        <i><a href="/account/login?next=/votings/view/{{id}}">Log in</a> to vote!</i>
+                        {% endif %}
                     </form>
                 </div>
-                <script>
-                    document.getElementById("voteform").onsubmit = buildAjaxFormHandler(function(resp){
-                        console.log(resp);
-                    });
-                </script>
             </div>
             <div class="card-footer">
-                <p class="text-secondary-emphasis"><i class="bi bi-person-fill"></i> Created by <a href="/user/{{author.id}}" class="text-reset" target="_blank">{{author.username}}</a></p>
-                <a class="text-danger text-decoration-none" href="/votings/report/{{id}}" target="_blank"><i class="bi bi-flag-fill"></i> Report</a>
+                {% if user.is_authenticated and author == user %}
+                <p>TODO: put edit elements here</p>
+                {% elif user.is_authenticated %}
+                <p class="text-secondary-emphasis mb-0"><i class="bi bi-person-fill"></i> Created by <a href="/user/{{author.id}}" class="text-reset" target="_blank">{{author.username}}</a></p>
+                <a class="text-danger text-decoration-none mb-0" href="/votings/report/{{id}}" target="_blank"><i class="bi bi-flag-fill"></i> Report abuse</a>
+                {% else %}
+                <p class="text-secondary-emphasis mb-0"><i class="bi bi-person-fill"></i> Created by <a href="/user/{{author.id}}" class="text-reset" target="_blank">{{author.username}}</a></p>
+                {% endif %}
             </div>
         </div>
     </div>
 </div>
+<script>
+    function rebuildOptionSelection(e){
+        let selected = [];
+        let options = document.getElementById("voteform").querySelectorAll("input");
+        options.forEach(option => {
+            if(option.checked)selected.push(option.value);
+        });
+        document.getElementById("multichoiceoptions").value = b64enc(JSON.stringify(selected));
+    }
+    document.getElementById("voteform").onsubmit = buildAjaxFormHandler(function(resp){
+        console.log(resp);
+    });
+</script>
 {% endblock %}

@@ -5,5 +5,6 @@
 - [Методы AJAX](/doc/js/ajax.md)
 - [Утилиты для HTML](/doc/js/htmlutils.md)
 - [Утилиты для работы с формами](/doc/js/formutils.md)
+- [Прочие JS-утилиты](/doc/js/misc.md)
 
 _Автоматически сгенерировано [DocGen](/doc/doc/index.md)_

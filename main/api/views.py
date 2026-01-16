@@ -2,6 +2,7 @@ from django.http import HttpResponse
 from main.util import *
 from main.models import *
 import json
+import base64
 from datetime import date as dateobj, time as timeobj, datetime as dtobj
 
 def test_api_view(req):
@@ -12,22 +13,32 @@ def voting_new_view(req):
         return respond(401, "UNAUTHORIZED")
     name = getPostOr(req, "name", False)
     desc = getPostOr(req, "description", "")
-    option1 = getPostOr(req, "option1", False)
-    option2 = getPostOr(req, "option2", False)
+    options = getPostOr(req, "options", False)
     close = getPostOr(req, "close", False)
     date = getPostOr(req, "date", False)
     time = getPostOr(req, "time", False)
+    multi = getPostOr(req, "multichoice", False)
 
-    if False in [name, option1, option2, close]:
+    if False in [name, options, close]:
         return respond(400, "BADREQUEST")
     
     if not checkVars([
         [str, name, 1, 48],
         [str, desc, 0, 512],
-        [str, option1, 1, 48],
-        [str, option2, 0, 48],
         [["auto", "manual"], close]
     ]):
+        return respond(400, "BADREQUEST")
+    try:
+        options = base64.decodebytes(bytes(options, encoding="utf-8")).decode(encoding="utf-8")
+        options = json.loads(options)
+        for option in options:
+            if not (1 < len(option) < 48):
+                return respond(400, "BADREQUEST")
+        if len(options) < 2:
+            return respond(400, "TOOFEWOPTIONS")
+        elif len(options) > 10:
+            return respond(400, "TOOMANYOPTIONS")
+    except:
         return respond(400, "BADREQUEST")
     
     if close == "auto" and False in [date, time]:
@@ -38,9 +49,16 @@ def voting_new_view(req):
             date = dateobj.fromisoformat(date)
             time = timeobj.fromisoformat(time)
             datetime = dtobj.combine(date, time)
+            if datetime.timestamp() < datetime.now().timestamp():
+                return respond(400, "DATEINPAST")
         except ValueError:
             return respond(400, "BADDATE")
     
-    voting = Voting(author=req.user, name=name, description=desc, option1=option1, option2=option2, date_closed=datetime)
+    voting = Voting(author=req.user, name=name, description=desc, options=options, date_closed=datetime, multichoice=(multi!=False))
     voting.save()
-    return HttpResponse("OK")
+    return HttpResponse(str(voting.id))
+
+def voting_vote_view(req, id:int):
+    if not req.user.is_authenticated:
+        return respond(401, "UNAUTHORIZED")
+    pass

@@ -189,3 +189,13 @@ function validateFormInput(input){
     return VALID;
 }
 //#endregion formvalidation
+//#region misc
+const strencoder = new TextEncoder();
+const strdecoder = new TextDecoder();
+function b64enc(str){
+    return btoa(String.fromCharCode(...strencoder.encode(str)));
+}
+function b64dec(b64str){
+    return strdecoder.decode(Uint8Array.from(atob(b64str), c => c.charCodeAt(0)));
+}
+//#endregion misc

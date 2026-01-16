@@ -4,10 +4,12 @@
 <li class="mb-0 mt-0"><p class="mb-0 mt-0">{{ test.0 }}: {% if test.1 %}<span class="text-success">PASS</span>{% else %}<span class="text-danger">FAIL</span>{% endif %}</p></li>
 {% endfor %}
 {% endpartialdef %}
+{% block title %}Simple Votings Unit Testing{% endblock %}
 {% block content %}
+<h1>Unit Testing</h1>
 <button class="btn btn-primary" id="test-button" style="max-width: 30vw;">test spinner and toast</button>
 <br>
-<h1>Form controls test</h1>
+<h2>Form controls test</h2>
 <form action="/api/test" id="controltest">
     {% csrf_token %}
     <select name="select_test">
@@ -23,7 +25,7 @@
     <button type="submit">Submit</button>
 </form>
 <a class="btn btn-primary" data-bs-toggle="collapse" href="#" data-bs-target="#cvTestsCollapse" role="button" aria-expanded="false" aria-controls="cvTestsCollapse">
-    open checkVars tests
+    open checkVars test results
 </a>
 <ol class="collapse" id="cvTestsCollapse">
     {% with tests=checkvars_tests %}

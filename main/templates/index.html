@@ -1,4 +1,18 @@
 {% extends "abc/with_sidebar.html" %}
 {% block content %}
+<h1>Simple Votings</h1>
+<h4><i>Create simple public votings quickly and easily.</i></h4>
 <a class="btn btn-primary" id="create-button" style="max-width: 30vw;" href="/votings/new">Create a voting</a>
+<hr>
+<form action="/api/search" method="POST" class="row align-items-center w-100">
+    <div class="col-sm-6 col-md-8">
+        <input class="form-control" type="text" name="query" placeholder="Search...">
+    </div>
+    <div class="col-6 col-md-4">
+        <button class="btn btn-primary" type="submit">Search</button>
+    </div>
+</form>
+<div id="searchresults">
+    <h1>TODO!</h1>
+</div>
 {% endblock %}

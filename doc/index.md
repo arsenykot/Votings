@@ -10,6 +10,7 @@
 - - [Методы AJAX](/doc/js/ajax.md)
 - - [Утилиты для HTML](/doc/js/htmlutils.md)
 - - [Утилиты для работы с формами](/doc/js/formutils.md)
+- - [Прочие JS-утилиты](/doc/js/misc.md)
 - [Корень документации Python](/doc/py/index.md)
 - - [Django-модели](/doc/py/models.md)
 - - [Python-утилиты](/doc/py/util/index.md)

@@ -44,3 +44,8 @@
     resize: none;
     height: 160px;
 }
+
+.tcenter{
+    width: 100%;
+    text-align: center;
+}

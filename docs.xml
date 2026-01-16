@@ -92,17 +92,17 @@
                     <type>String[1..512]?</type>
                     <desc>Описание голосования</desc>
                 </arg>
-                <arg><name>option1</name>
-                    <type>String[1..48]</type>
-                    <desc>Опция 1 (в дальнейшем будет переработано)</desc>
-                </arg>
-                <arg><name>option2</name>
-                    <type>String[1..48]</type>
-                    <desc>Опция 2 (в дальнейшем будет переработано)</desc>
+                <arg><name>options</name>
+                    <type>String</type>
+                    <desc>Base64-закодированная строка, содержащая все опции в формате JSON.</desc>
                 </arg>
                 <arg><name>close</name>
                     <type>"auto" | "manual"</type>
                     <desc>Способ закрытия голосования</desc>
+                </arg>
+                <arg><name>multichoice</name>
+                    <type>"on"?</type>
+                    <desc>Возможность выбора нескольких вариантов ответа. Если не указано - выключено, иначе - включено</desc>
                 </arg>
                 <arg><name>date</name>
                     <type>String?</type>
@@ -116,7 +116,16 @@
                     <when>Передано недостаточно аргументов или аргументы имеют неверный формат</when>
                 </resp>
                 <resp><code>400</code><data>BADDATE</data>
-                    <when>Дата или время имеют неверный формат</when>
+                    <when>Дата и/или время имеют неверный формат</when>
+                </resp>
+                <resp><code>400</code><data>DATEINPAST</data>
+                    <when>Дата и время находятся в прошлом</when>
+                </resp>
+                <resp><code>400</code><data>TOOFEWOPTIONS</data>
+                    <when>Слишком мало вариантов ответа</when>
+                </resp>
+                <resp><code>400</code><data>TOOMANYOPTIONS</data>
+                    <when>Слишком много вариантов ответа</when>
                 </resp>
                 <resp><code>401</code><data>UNAUTHORIZED</data>
                     <when>Пользователь не авторизован</when>
@@ -260,6 +269,25 @@
                     <desc>Поле ввода</desc>
                 </arg>
                 <ret>bool</ret>
+            </method>
+        </file>
+        <file><path>misc</path>
+            <title>Прочие JS-утилиты</title>
+            <method><name>b64enc</name>
+                <desc>Кодирует строку в Base64. В отличие от встроенного `btoa`, поддерживает кириллицу</desc>
+                <arg><name>str</name>
+                    <type>String</type>
+                    <desc>Строка для кодирования в Base64</desc>
+                </arg>
+                <ret>String</ret>
+            </method>
+            <method><name>b64dec</name>
+                <desc>Декодирует строку из Base64. В отличие от встроенного `atob`, поддерживает кириллицу</desc>
+                <arg><name>b64str</name>
+                    <type>String</type>
+                    <desc>Строка для декодирования из Base64</desc>
+                </arg>
+                <ret>String</ret>
             </method>
         </file>
     </folder>
