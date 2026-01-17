@@ -1,70 +1,159 @@
 {% extends "abc/with_sidebar.html" %}
-{% block title %}Simple Votings - "{{title}}"{% endblock %}
+{% block title %}Simple Votings - "{{ title }}"{% endblock %}
+
 {% block content %}
+
+<style>
+    .card.mb-4 {
+        position: relative;
+    }
+
+    .edit-btn{
+        position: absolute;
+        top: 10px;
+        left: -33px;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        text-decoration: none;
+        border-radius: 6px;
+        opacity: 0.7;
+    }
+
+    .edit-btn:hover{
+        opacity: 1;
+    }
+</style>
+
 <div class="row">
     <div class="col-md-8 col-lg-6">
         <div class="card mb-4">
+
+            {% if user.is_authenticated and author == user %}
+                <a href="/votings/edit/{{ id }}" class="edit-btn" title="Edit voting">
+                    <i class="bi bi-pencil-square"></i>
+                </a>
+            {% endif %}
+
             <div class="card-header">
                 <h5 class="mb-0">
                     <i class="bi bi-list-check"></i>
-                    {{title}}
+                    {{ title }}
                 </h5>
             </div>
+
             <div class="card-body">
                 <div class="mb-3">
-                    <p>
-                        {{description}}
-                    </p>
+                    <p>{{ description }}</p>
                 </div>
+
                 <hr>
+
                 <div class="mb-3">
-                    <form action="/api/voting/vote/{{id}}" method="POST" id="voteform">
+                    <form action="/api/voting/vote/{{ id }}" method="POST" id="voteform">
                         {% csrf_token %}
+
                         {% if multichoice %}
-                        <input type="text" name="option" id="multichoiceoptions" hidden>
-                        {%endif%}
-                        {% for id, option in options %}
-                        {% if multichoice %}
-                        <label><input type="checkbox" class="form-check-input close" onclick="javascript:rebuildOptionSelection();" value="{{id}}"> {{option}}</label>
-                        {% else %}
-                        <label><input type="radio" class="form-check-input close" name="option" value="{{id}}"> {{option}}</label>
+                            <input type="text" name="option" id="multichoiceoptions" hidden>
                         {% endif %}
-                        <br>
+
+                        {% for opt_id, option in options %}
+                            {% if multichoice %}
+                                <label>
+                                    <input type="checkbox"
+                                           class="form-check-input close"
+                                           onclick="rebuildOptionSelection();"
+                                           value="{{ opt_id }}">
+                                    {{ option }}
+                                </label>
+                            {% else %}
+                                <label>
+                                    <input type="radio"
+                                           class="form-check-input close"
+                                           name="option"
+                                           value="{{ opt_id }}">
+                                    {{ option }}
+                                </label>
+                            {% endif %}
+                            <br>
                         {% endfor %}
+
                         <br>
+
                         {% if user.is_authenticated and author == user %}
+                            {# автор не голосует #}
                         {% elif user.is_authenticated %}
-                        <button type="submit" data-spinner-text="Submitting your vote..." class="btn btn-primary">{% if voted %}Change vote{%else%}Vote{%endif%}</button>
+                            <button type="submit"
+                                    data-spinner-text="Submitting your vote..."
+                                    class="btn btn-primary">
+                                {% if voted %}Change vote{% else %}Vote{% endif %}
+                            </button>
                         {% else %}
-                        <i><a href="/account/login?next=/votings/view/{{id}}">Log in</a> to vote!</i>
+                            <i>
+                                <a href="/account/login?next=/votings/view/{{ id }}">
+                                    Log in
+                                </a> to vote!
+                            </i>
                         {% endif %}
                     </form>
                 </div>
             </div>
+
             <div class="card-footer">
                 {% if user.is_authenticated and author == user %}
-                <p>TODO: put edit elements here</p>
+                    <a href="/votings/edit/{{ id }}" class="text-decoration-none">
+                        <i class="bi bi-pencil-square"></i> Edit voting
+                    </a>
                 {% elif user.is_authenticated %}
-                <p class="text-secondary-emphasis mb-0"><i class="bi bi-person-fill"></i> Created by <a href="/user/{{author.id}}" class="text-reset" target="_blank">{{author.username}}</a></p>
-                <a class="text-danger text-decoration-none mb-0" href="/votings/report/{{id}}" target="_blank"><i class="bi bi-flag-fill"></i> Report abuse</a>
+                    <p class="text-secondary-emphasis mb-0">
+                        <i class="bi bi-person-fill"></i>
+                        Created by
+                        <a href="/user/{{ author.id }}" class="text-reset" target="_blank">
+                            {{ author.username }}
+                        </a>
+                    </p>
+                    <a class="text-danger text-decoration-none mb-0"
+                       href="/votings/report/{{ id }}"
+                       target="_blank">
+                        <i class="bi bi-flag-fill"></i> Report abuse
+                    </a>
                 {% else %}
-                <p class="text-secondary-emphasis mb-0"><i class="bi bi-person-fill"></i> Created by <a href="/user/{{author.id}}" class="text-reset" target="_blank">{{author.username}}</a></p>
+                    <p class="text-secondary-emphasis mb-0">
+                        <i class="bi bi-person-fill"></i>
+                        Created by
+                        <a href="/user/{{ author.id }}" class="text-reset" target="_blank">
+                            {{ author.username }}
+                        </a>
+                    </p>
                 {% endif %}
             </div>
+
         </div>
     </div>
 </div>
+
 <script>
-    function rebuildOptionSelection(e){
+    function rebuildOptionSelection(){
         let selected = [];
-        let options = document.getElementById("voteform").querySelectorAll("input");
+        let options = document
+            .getElementById("voteform")
+            .querySelectorAll("input");
+
         options.forEach(option => {
-            if(option.checked)selected.push(option.value);
+            if(option.checked) selected.push(option.value);
         });
-        document.getElementById("multichoiceoptions").value = b64enc(JSON.stringify(selected));
+
+        document.getElementById("multichoiceoptions").value =
+            b64enc(JSON.stringify(selected));
     }
-    document.getElementById("voteform").onsubmit = buildAjaxFormHandler(function(resp){
-        console.log(resp);
-    });
+
+    document.getElementById("voteform").onsubmit =
+        buildAjaxFormHandler(function(resp){
+            console.log(resp);
+        });
 </script>
+
 {% endblock %}

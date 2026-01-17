@@ -1,8 +1,9 @@
 from main.util import *
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseForbidden
 from main.models import *
+
 
 @check_auth(auth = False)
 def index_page_view(req):
@@ -107,3 +108,38 @@ def account_sessions_view(req):
 @login_required()
 def ban_page_view(req):
     return render(req, "account/banned.html")
+
+@check_auth()
+def voting_edit(req, id: int):
+    voting = Voting.objects.filter(id=id)
+    if len(voting) <= 0:
+        return render(req, "votings/error/not_found.html", status=404)
+
+    voting = voting[0]
+
+    if req.user != voting.author:
+        return HttpResponseForbidden("You are not allowed to edit this voting")
+
+    if req.method == "POST":
+        voting.name = req.POST.get("title", "").strip()
+        voting.description = req.POST.get("description", "").strip()
+        voting.multichoice = bool(req.POST.get("multichoice"))
+
+        raw_options = req.POST.get("options", "")
+        options = [o.strip() for o in raw_options.splitlines() if o.strip()]
+
+        if len(options) < 2:
+            return render(req, "votings/edit.html", {
+                "voting": voting,
+                "error": "Voting must have at least 2 options"
+            })
+
+        voting.options = options
+        voting.save()
+
+        return redirect(f"/votings/view/{voting.id}")
+
+    return render(req, "votings/edit.html", {
+        "voting": voting,
+        "options_text": "\n".join(voting.options)
+    })
