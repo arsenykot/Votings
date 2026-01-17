@@ -56,7 +56,6 @@ def existing_voting_view(req, id:int):
 def tos_page_view(req):
     return render(req, "tos.html")
 
-@check_auth()
 def test_page_view(req):
     checkvars_tests = [
         ["Length min ok test",[str, "abcdef", 6], True],

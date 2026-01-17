@@ -4,16 +4,33 @@ from main.models import *
 import json
 import base64
 from datetime import date as dateobj, time as timeobj, datetime as dtobj
+from random import randint
+from django.contrib.auth import login
 
+# Под удаление перед релизом
 @check_auth(redir=False)
 def test_api_view(req):
     return HttpResponse(json.dumps({"POST": req.POST, "GET": req.GET}, indent=2, ensure_ascii=False))
 
+# Под удаление перед релизом
 @check_auth(redir=False)
 def ban_self_view(req):
     req.user.is_banned = True
     req.user.save()
     return respond(200, "Goodbye!")
+
+# Под удаление перед релизом
+def create_account_quick(req, arg:str):
+    u = User(username="u"+str(randint(100000, 999999)))
+    u.is_active = True
+    if arg in ["staff", "su"]:
+        u.is_staff = True
+    if arg == "su":
+        u.is_superuser = True
+    u.set_password("1234567890")
+    u.save()
+    login(req, u)
+    return redirect("/test")
 
 @check_auth(redir=False)
 def voting_new_view(req):

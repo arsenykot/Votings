@@ -120,6 +120,7 @@ function buildAjaxFormHandler(callback){
         let requestData = {};
         let spinnerElements = [];
         formElements.forEach(element => {
+            if(element.name == "") return;
             if(element.name=="csrfmiddlewaretoken") headers.push(["X-CSRFToken", element.value]);
 
             if(element.type=="checkbox") requestData[element.name] = element.checked ? "on":"off";

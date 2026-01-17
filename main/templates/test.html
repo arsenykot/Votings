@@ -32,7 +32,11 @@
     {% partial tests_view %}
     {% endwith %}
 </ol>
-<a class="btn btn-danger" href="javascript:banself();">Ban self</a>
+<h2>Accounts test</h2>
+<a class="btn btn-primary" style="max-width: 30vw;" href="/api/test_user/regular/">new regular</a>
+<a class="btn btn-danger" style="max-width: 30vw;" href="/api/test_user/staff/">new staff</a>
+<a class="btn btn-danger" style="max-width: 30vw;" href="/api/test_user/su/">new superuser</a>
+<a class="btn btn-danger" href="javascript:banself();">Ban current account</a>
 <script>
 function banself(){
     ajaxGet("/api/ban_self", function(resp){
