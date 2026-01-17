@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseForbidden
 from main.models import *
-
+import json
 
 @check_auth(auth = False)
 def index_page_view(req):
@@ -95,7 +95,13 @@ def test_page_view(req):
     ]
     for test in checkvars_tests:
         test[1] = (checkVars([test[1]]) == test[2])
-    return render(req, "test.html", {"checkvars_tests": checkvars_tests})
+    b64_tests = [
+        ["base64 encode decode small test", b64dec(b64enc("qwerty")) == "qwerty"],
+        ["base64 encode decode big test", b64dec(b64enc(LOREM_IPSUM)) == LOREM_IPSUM],
+        ["base64 encode small test", b64enc("qwerty") == "cXdlcnR5"],
+        ["base64 encode big test", b64enc(LOREM_IPSUM) == LOREM_IPSUM_B64]
+    ]
+    return render(req, "test.html", {"checkvars_tests": checkvars_tests, "base64_tests":b64_tests})
 
 @check_auth()
 def account_settings_view(req):
@@ -117,29 +123,7 @@ def voting_edit(req, id: int):
 
     voting = voting[0]
 
-    if req.user != voting.author:
-        return HttpResponseForbidden("You are not allowed to edit this voting")
-
-    if req.method == "POST":
-        voting.name = req.POST.get("title", "").strip()
-        voting.description = req.POST.get("description", "").strip()
-        voting.multichoice = bool(req.POST.get("multichoice"))
-
-        raw_options = req.POST.get("options", "")
-        options = [o.strip() for o in raw_options.splitlines() if o.strip()]
-
-        if len(options) < 2:
-            return render(req, "votings/edit.html", {
-                "voting": voting,
-                "error": "Voting must have at least 2 options"
-            })
-
-        voting.options = options
-        voting.save()
-
-        return redirect(f"/votings/view/{voting.id}")
-
     return render(req, "votings/edit.html", {
         "voting": voting,
-        "options_text": "\n".join(voting.options)
+        "options": b64enc(json.dumps(voting.options))
     })

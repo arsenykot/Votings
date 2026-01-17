@@ -4,6 +4,7 @@ from main.models import User
 from django.http import HttpResponse
 from django.shortcuts import redirect
 import re
+import base64
 
 USERNAME_RE_MATCH = re.compile(r"^([a-z0-9\.]{4,24})$")
 
@@ -110,3 +111,14 @@ def check_auth(auth = True, bans = True, redir = True):
             return func(*args, **kwargs)
         return wrap
     return decorator
+
+def b64dec(b64str):
+    fmtstr = '\n'.join(b64str[pos:pos+76] for pos in range(0, len(b64str), 76))
+    return base64.decodebytes(bytes(fmtstr, encoding="utf-8")).decode(encoding="utf-8")
+
+def b64enc(rawstr):
+    encstr = base64.encodebytes(bytes(rawstr, encoding="utf-8")).decode(encoding="utf-8")
+    return encstr.replace("\n","")
+
+LOREM_IPSUM = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent iaculis erat eu libero efficitur, vel ultrices ipsum consequat. Cras finibus tincidunt mi, non eleifend orci."
+LOREM_IPSUM_B64 = "TG9yZW0gaXBzdW0gZG9sb3Igc2l0IGFtZXQsIGNvbnNlY3RldHVyIGFkaXBpc2NpbmcgZWxpdC4gUHJhZXNlbnQgaWFjdWxpcyBlcmF0IGV1IGxpYmVybyBlZmZpY2l0dXIsIHZlbCB1bHRyaWNlcyBpcHN1bSBjb25zZXF1YXQuIENyYXMgZmluaWJ1cyB0aW5jaWR1bnQgbWksIG5vbiBlbGVpZmVuZCBvcmNpLg=="

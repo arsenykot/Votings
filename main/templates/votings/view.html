@@ -32,12 +32,6 @@
     <div class="col-md-8 col-lg-6">
         <div class="card mb-4">
 
-            {% if user.is_authenticated and author == user %}
-                <a href="/votings/edit/{{ id }}" class="edit-btn" title="Edit voting">
-                    <i class="bi bi-pencil-square"></i>
-                </a>
-            {% endif %}
-
             <div class="card-header">
                 <h5 class="mb-0">
                     <i class="bi bi-list-check"></i>

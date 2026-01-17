@@ -32,6 +32,14 @@
     {% partial tests_view %}
     {% endwith %}
 </ol>
+<a class="btn btn-primary" data-bs-toggle="collapse" href="#" data-bs-target="#b64TestsCollapse" role="button" aria-expanded="false" aria-controls="b64TestsCollapse">
+    open base64 test results
+</a>
+<ol class="collapse" id="b64TestsCollapse">
+    {% with tests=base64_tests %}
+    {% partial tests_view %}
+    {% endwith %}
+</ol>
 <a class="btn btn-danger" href="javascript:banself();">Ban self</a>
 <script>
 function banself(){

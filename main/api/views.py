@@ -2,7 +2,6 @@ from django.http import HttpResponse
 from main.util import *
 from main.models import *
 import json
-import base64
 from datetime import date as dateobj, time as timeobj, datetime as dtobj
 
 @check_auth(redir=False)
@@ -36,7 +35,7 @@ def voting_new_view(req):
     ]):
         return respond(400, "BADREQUEST")
     try:
-        options = base64.decodebytes(bytes(options, encoding="utf-8")).decode(encoding="utf-8")
+        options = b64dec(options)
         options = json.loads(options)
         for option in options:
             if not (1 < len(option) < 48):
@@ -68,3 +67,48 @@ def voting_new_view(req):
 @check_auth(redir=False)
 def voting_vote_view(req, id:int):
     pass
+
+@check_auth(redir=False)
+def voting_edit_view(req, id:int):
+    voting = Voting.objects.filter(id=id)
+    totalChangedChars = 0 # todo: ограничить максимальное число модификаций
+    if len(voting) <= 0:
+        return respond(404, "NOTFOUND")
+    voting = voting[0]
+    
+    if req.user != voting.author:
+        return respond(403, "FORBIDDEN")
+    
+    name = getPostOr(req, "title", False)
+    desc = getPostOr(req, "description", False)
+    multichoice = getPostOr(req, "multichoice", False)
+    if False in [name, multichoice]:
+        return respond(400, "BADREQUEST")
+    if not checkVars([
+        [str, name, 1, 48],
+        [str, desc, 0, 512],
+        [["on", "off"], multichoice]
+    ]):
+        return respond(400, "BADREQUEST")
+    voting.name = name
+    voting.description = desc
+    voting.multichoice = multichoice=="on"
+
+    raw_options = getPostOr(req, "options", False)
+    try:
+        options = json.loads(b64dec(raw_options))
+        for option in options:
+            if not 0 < len(option) <= 48:
+                return respond("BADREQUEST")
+    except:
+        return respond(400, "BADREQUEST")
+
+    if len(options) < 2:
+        return respond(400, "TOOFEWOPTIONS")
+    elif len(options) > 10:
+        return respond(400, "TOOMANYOPTIONS")
+
+    voting.options = options
+    voting.save()
+
+    return respond(200, "OK")
