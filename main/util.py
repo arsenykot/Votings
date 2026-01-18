@@ -93,7 +93,7 @@ def checkVars(data_list):
         
     return True
 
-def check_auth(auth = True, bans = True, redir = True):
+def check_access(auth = True, bans = True, redir = True):
     def decorator(func):
         def wrap(*args, **kwargs):
             req = args[0]

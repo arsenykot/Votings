@@ -5,7 +5,7 @@ from django.http import HttpResponse, HttpResponseForbidden
 from main.models import *
 import json
 
-@check_auth(auth = False)
+@check_access(auth = False)
 def index_page_view(req):
    return render(req, "index.html")
 
@@ -33,11 +33,11 @@ def register_page_view(req):
         "next": goto
     })
 
-@check_auth()
+@check_access()
 def profile_page_view(req):
     return render(req, "account/profile.html")
 
-@check_auth(auth=False)
+@check_access(auth=False)
 def existing_voting_view(req, id:int):
     voting = Voting.objects.filter(id=id)
     if len(voting) <= 0:
@@ -57,7 +57,7 @@ def existing_voting_view(req, id:int):
 def tos_page_view(req):
     return render(req, "tos.html")
 
-@check_auth()
+@check_access()
 def test_page_view(req):
     checkvars_tests = [
         ["Length min ok test",[str, "abcdef", 6], True],
@@ -103,11 +103,11 @@ def test_page_view(req):
     ]
     return render(req, "test.html", {"checkvars_tests": checkvars_tests, "base64_tests":b64_tests})
 
-@check_auth()
+@check_access()
 def account_settings_view(req):
     return render(req, "account/settings.html", {})
 
-@check_auth()
+@check_access()
 def account_sessions_view(req):
     return render(req, "account/sessions.html", {})
 
@@ -115,7 +115,7 @@ def account_sessions_view(req):
 def ban_page_view(req):
     return render(req, "account/banned.html")
 
-@check_auth()
+@check_access()
 def voting_edit(req, id: int):
     voting = Voting.objects.filter(id=id)
     if len(voting) <= 0:
