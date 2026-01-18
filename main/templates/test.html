@@ -32,6 +32,14 @@
     {% partial tests_view %}
     {% endwith %}
 </ol>
+<a class="btn btn-primary" data-bs-toggle="collapse" href="#" data-bs-target="#b64TestsCollapse" role="button" aria-expanded="false" aria-controls="b64TestsCollapse">
+    open base64 test results
+</a>
+<ol class="collapse" id="b64TestsCollapse">
+    {% with tests=base64_tests %}
+    {% partial tests_view %}
+    {% endwith %}
+</ol>
 <h2>Accounts test</h2>
 <a class="btn btn-primary" style="max-width: 30vw;" href="/api/test_user/regular/">new regular</a>
 <a class="btn btn-danger" style="max-width: 30vw;" href="/api/test_user/staff/">new staff</a>

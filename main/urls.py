@@ -16,6 +16,7 @@ urlpatterns = [
     path('votings/new', new_voting_view),
 #    path('votings/list', voting_list_view),
     path('votings/view/<int:id>', existing_voting_view),
+    path('votings/edit/<int:id>', voting_edit),
     path('account/register', register_page_view),
     path('account/profile', profile_page_view)
 ]

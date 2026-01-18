@@ -1,0 +1,88 @@
+{% extends "abc/with_sidebar.html" %}
+{% block title %}Simple Votings - Editing "{{voting.name}}"{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-8 col-lg-6">
+  <form method="post" action="/api/voting/edit/{{voting.id}}" id="editform">
+    {% csrf_token %}
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0">Edit voting</h5>
+      </div>
+
+      <div class="card-body">
+
+        {% if error %}
+          <div class="alert alert-danger">{{ error }}</div>
+        {% endif %}
+
+          <div class="mb-3">
+            <label class="form-label">Title</label>
+            <input class="form-control"
+                   type="text"
+                   name="title"
+                   value="{{ voting.name }}"
+                   required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Description</label>
+            <textarea class="form-control"
+                      name="description"
+                      rows="3"
+                      required>{{ voting.description }}</textarea>
+          </div>
+
+          <div class="form-check mb-3">
+            <input class="form-check-input"
+                   type="checkbox"
+                   name="multichoice"
+                   {% if voting.multichoice %}checked{% endif %}>
+            <label class="form-check-label">
+              Allow multiple choices
+            </label>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Options</label>
+            <div id="optionbuilder">
+            </div>
+          </div>
+
+      </div>
+      <div class="card-footer">
+        <button class="btn btn-primary" type="submit">Save</button>
+        <a href="/votings/view/{{ voting.id }}" class="btn btn-secondary">Cancel</a>
+      </div>
+    </div>
+  </form>
+  </div>
+</div>
+<script>
+let votingOptions = JSON.parse(b64dec("{{options}}"));
+let optionBuilder = new OptionBuilderElement(document.getElementById("optionbuilder"));
+votingOptions.forEach(optionText=>{
+  optionBuilder.createNewOption(optionBuilder, optionText);
+});
+document.getElementById("editform").onsubmit = buildAjaxFormHandler(function(resp){
+  if(resp.status==200) window.location.replace("/votings/view/{{voting.id}}");
+  else{
+    switch (resp.content){
+      case "TOOMANYOPTIONS":
+      errorToast(false, "Too many options specified. Add at most 10.");
+      break;
+      case "TOOFEWOPTIONS":
+      errorToast(false, "Too few options specified. Add at least 2.");
+      break;
+      case "FORBIDDEN":
+      errorToast(false, "Insufficient permissions.");
+      break;
+      case "BADREQUEST":
+      errorToast(false, "Invalid data specified.");
+      break;
+    }
+  }
+});
+</script>
+{% endblock %}

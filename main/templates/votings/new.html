@@ -1,10 +1,10 @@
 {% extends "abc/with_sidebar.html" %}
 {% block content %}
 <div class="row">
-    <form id="newform" action="/api/new">
+    <form id="newform" action="/api/voting/new" autocomplete="off">
         <h1 class="h3 mb-3 fw-normal">Create a voting</h1>
         {% csrf_token %}
-        <div class="col-md-8 col-lg-6">
+        <div class="col-md-8 col-lg-6 min-vw-50 vw-50">
             <div class="card mb-4">
                 <div class="card-header">
                     <h5 class="mb-0">
@@ -17,11 +17,13 @@
                     </div>
                     <hr>
                     <h5>Voting options</h5>
-                    <input name="options" type="text" id="optionscontainer" hidden>
+                    <div id="optionbuilder">
+                    </div>
+                    {% comment %} <input name="options" type="text" id="optionscontainer" hidden>
                     <ol class="mb-3" id="optionbuilder">
                     </ol>
-                    <a href="javascript:optionBuilderNew()" class="btn btn-primary" id="addnewoption"><i class="bi bi-plus"></i>Add option</a>
-                    <br><br>
+                    <a href="javascript:optionBuilderNew()" class="btn btn-primary" id="addnewoption"><i class="bi bi-plus"></i>Add option</a> {% endcomment %}
+                    <br>
                     <label><input type="checkbox" class="form-check-input close" name="multichoice" value="yes"> Allow multiple options to be selected</label>
                     <hr>
                     <h5>Voting closing</h5>
@@ -41,51 +43,6 @@
                     <br><br>
                     <button type="submit" data-spinner-text="Creating..." class="btn btn-primary">Create voting</button>
                     <script>
-                        let optionBuilder = document.getElementById("optionbuilder");
-                        let optionContainer = document.getElementById("optionscontainer");
-                        let optionElements = [];
-                        function rebuildOptions(){
-                            let options = [];
-                            optionElements.forEach(option => {
-                                options.push(option.children[0].value);
-                            });
-                            optionContainer.value = b64enc(JSON.stringify(options));
-                        }
-                        function optionBuilderEdit(e){
-                            rebuildOptions();
-                        }
-                        function updateOptionBuilderButton(){
-                            let button = document.getElementById("addnewoption");
-                            if(optionElements.length >= 10) button.classList.add("disabled");
-                            else button.classList.remove("disabled");
-                        }
-                        function optionBuilderNew(){
-                            let element = document.createElement("li");
-                            let nameEdit = document.createElement("input");
-                            nameEdit.type = "text";
-                            nameEdit.placeholder = "Option text";
-                            nameEdit.addEventListener("change", optionBuilderEdit);
-                            element.appendChild(nameEdit);
-                            let removeButton = document.createElement("a");
-                            removeButton.classList.add("text-danger");
-                            removeButton.href="#";
-                            removeButton.innerHTML = "<i class='bi bi-trash-fill'></i>";
-                            removeButton.addEventListener("click", optionBuilderDelete);
-                            element.appendChild(removeButton);
-                            element.classList.add("mb-1");
-                            optionBuilder.append(element);
-                            optionElements.push(element);
-                            updateOptionBuilderButton();
-                            rebuildOptions();
-                        }
-                        function optionBuilderDelete(e){
-                            let element = e.target.parentElement.parentElement;
-                            optionElements.pop(optionElements.indexOf(element));
-                            element.remove();
-                            updateOptionBuilderButton();
-                            rebuildOptions();
-                            if(optionElements.length < 2) errorToast(false, "Too few options. Please create at least 2.");
-                        }
                         document.getElementById("newform").onsubmit = buildAjaxFormHandler(function(resp){
                         if(resp.status == 200){
                             spawnToast("success", "info-circle-fill", "Voting successfully created!");
@@ -128,7 +85,8 @@
                     }
                     radio1.addEventListener("input", radioUpdate);
                     radio2.addEventListener("input", radioUpdate);
-                    for(let i = 0; i < 2; i++) optionBuilderNew();
+                    let optionBuilder = new OptionBuilderElement(document.getElementById("optionbuilder"));
+                    for(let i = 0; i < 2; i++) optionBuilder.createNewOption();
                 </script>
             </div>
         </div>

@@ -1,10 +1,11 @@
 from main.util import *
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseForbidden
 from main.models import *
+import json
 
-@check_auth(auth = False)
+@check_access(auth = False)
 def index_page_view(req):
    return render(req, "index.html")
 
@@ -32,11 +33,11 @@ def register_page_view(req):
         "next": goto
     })
 
-@check_auth()
+@check_access()
 def profile_page_view(req):
     return render(req, "account/profile.html")
 
-@check_auth(auth=False)
+@check_access(auth=False)
 def existing_voting_view(req, id:int):
     voting = Voting.objects.filter(id=id)
     if len(voting) <= 0:
@@ -93,16 +94,35 @@ def test_page_view(req):
     ]
     for test in checkvars_tests:
         test[1] = (checkVars([test[1]]) == test[2])
-    return render(req, "test.html", {"checkvars_tests": checkvars_tests})
+    b64_tests = [
+        ["base64 encode decode small test", b64dec(b64enc("qwerty")) == "qwerty"],
+        ["base64 encode decode big test", b64dec(b64enc(LOREM_IPSUM)) == LOREM_IPSUM],
+        ["base64 encode small test", b64enc("qwerty") == "cXdlcnR5"],
+        ["base64 encode big test", b64enc(LOREM_IPSUM) == LOREM_IPSUM_B64]
+    ]
+    return render(req, "test.html", {"checkvars_tests": checkvars_tests, "base64_tests":b64_tests})
 
-@check_auth()
+@check_access()
 def account_settings_view(req):
     return render(req, "account/settings.html", {})
 
-@check_auth()
+@check_access()
 def account_sessions_view(req):
     return render(req, "account/sessions.html", {})
 
 @login_required()
 def ban_page_view(req):
     return render(req, "account/banned.html")
+
+@check_access()
+def voting_edit(req, id: int):
+    voting = Voting.objects.filter(id=id)
+    if len(voting) <= 0:
+        return render(req, "votings/error/not_found.html", status=404)
+
+    voting = voting[0]
+
+    return render(req, "votings/edit.html", {
+        "voting": voting,
+        "options": b64enc(json.dumps(voting.options))
+    })

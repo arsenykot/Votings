@@ -50,6 +50,72 @@ function errorToast(error, text){
 function clearError(){
     LAST_SEEN_ERROR_TOAST = null;
 }
+class OptionBuilderElement{
+    rebuildOptions() {
+        let options = [];
+        this.optionElements.forEach(option => {
+            options.push(option.children[0].value);
+        });
+        this.formOptionContainer.value = b64enc(JSON.stringify(options));
+    }
+    updateOptionBuilderButton() {
+        if (this.optionElements.length >= this.maxOptions) this.addOptionButton.classList.add("disabled");
+        else this.addOptionButton.classList.remove("disabled");
+    }
+    deleteRelatedOption(cthis=this, e) {
+        let element = e.target.parentElement.parentElement;
+        cthis.optionElements.pop(cthis.optionElements.indexOf(element));
+        element.remove();
+        cthis.updateOptionBuilderButton();
+        cthis.rebuildOptions();
+        if (cthis.optionElements.length < cthis.minOptions) errorToast(false, "Too few options. Please create at least 2.");
+    }
+    createNewOption(cthis=this, content="") {
+        let element = document.createElement("li");
+        let nameEdit = document.createElement("input");
+        nameEdit.type = "text";
+        nameEdit.placeholder = "Option text";
+        nameEdit.value = content;
+        nameEdit.addEventListener("change", function(e){cthis.rebuildOptions();});
+        element.appendChild(nameEdit);
+        let removeButton = document.createElement("a");
+        removeButton.classList.add("text-danger");
+        removeButton.href = "#";
+        removeButton.innerHTML = "<i class='bi bi-trash-fill'></i>";
+        removeButton.addEventListener("click", function(e){cthis.deleteRelatedOption(cthis, e)});
+        element.appendChild(removeButton);
+        element.classList.add("mb-1");
+        cthis.optionListElement.appendChild(element);
+        cthis.optionElements.push(element);
+        cthis.updateOptionBuilderButton();
+        cthis.rebuildOptions();
+    }
+    
+    constructor(element, name="options", min_options = 2, max_options = 10){
+        this.root = element;
+        this.maxOptions = max_options;
+        this.minOptions = min_options;
+
+        this.formOptionContainer = document.createElement("input");
+        this.formOptionContainer.hidden = true;
+        this.formOptionContainer.name = name;
+        this.formOptionContainer.type = "text";
+
+        this.optionElements = [];
+        this.optionListElement = document.createElement("ol");
+        this.optionListElement.classList.add("mb-3");
+
+        this.addOptionButton = document.createElement("a");
+        this.addOptionButton.classList.add("btn", "btn-primary");
+        let cthis = this;
+        this.addOptionButton.addEventListener("click", function(e){ e.preventDefault(); cthis.createNewOption(cthis); });
+        this.addOptionButton.innerText = "Add option";
+
+        this.root.appendChild(this.formOptionContainer);
+        this.root.appendChild(this.optionListElement);
+        this.root.appendChild(this.addOptionButton);
+    }
+}
 //#endregion htmlutils
 //#region ajax
 function ajaxQuery(endpoint, method, ready_callback, data = null, error_passthrough = false, httpheaders=[]){

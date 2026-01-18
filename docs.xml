@@ -295,6 +295,48 @@
         <title>Корень документации Python</title>
         <file><path>models</path>
             <title>Django-модели</title>
+            <model><name>User[AbstractUser]</name>
+                <desc>Описывает аккаунт пользователя</desc>
+                <arg><name>is_banned</name>
+                    <type>BooleanField</type>
+                    <desc>Указывает, заблокирован ли этот аккаунт за нарушение условий использования</desc>
+                </arg>
+            </model>
+            <model><name>Voting</name>
+                <desc>Описывает голосование</desc>
+                <arg><name>name</name>
+                    <type>CharField[1..48]</type>
+                    <desc>Название голосования</desc>
+                </arg>
+                <arg><name>description</name>
+                    <type>CharField[0..512]</type>
+                    <desc>Описание голосования</desc>
+                </arg>
+                <arg><name>options</name>
+                    <type>JSONField[list]</type>
+                    <desc>Массив вариантов ответа</desc>
+                </arg>
+                <arg><name>multichoice</name>
+                    <type>BooleanField</type>
+                    <desc>Указывает, доступен ли множественный выбор при голосовании</desc>
+                </arg>
+                <arg><name>author</name>
+                    <type>ForeignKey[User]</type>
+                    <desc>Пользователь, создавший голосование</desc>
+                </arg>
+                <arg><name>taken_down</name>
+                    <type>BooleanField</type>
+                    <desc>Указывает, снято ли голосование с показа за нарушение условий обслуживания</desc>
+                </arg>
+                <arg><name>date_created</name>
+                    <type>DateTimeField</type>
+                    <desc>Дата и время создания голосования</desc>
+                </arg>
+                <arg><name>date_closed</name>
+                    <type>DateTimeField</type>
+                    <desc>Дата и время запланированного завершения голосования или дата и время ручного завершения голосования</desc>
+                </arg>
+            </model>
         </file>
         <folder><path>util</path>
             <title>Python-утилиты</title>
@@ -353,6 +395,22 @@
                     </arg>
                     <ret>bool</ret>
                 </method>
+                <method><name>b64enc</name>
+                    <desc>Используется для кодирования строки в Base64</desc>
+                    <arg><name>rawstr</name>
+                        <type>str</type>
+                        <desc>Строка для кодирования</desc>
+                    </arg>
+                    <ret>str</ret>
+                </method>
+                <method><name>b64dec</name>
+                    <desc>Используется для декодирования строки из Base64</desc>
+                    <arg><name>b64str</name>
+                        <type>str</type>
+                        <desc>Строка для декодирования</desc>
+                    </arg>
+                    <ret>str</ret>
+                </method>
                 <table><name>Фиктивный тип var_def</name>
                     <header>Индекс;Тип/Значения;Описание</header>
                     <row>0;`str|int|float|list`;Тип переменной для проверки ИЛИ список валидных значений</row>
@@ -389,7 +447,7 @@
                     </arg>
                     <ret>bool</ret>
                 </method>
-                <method><name>@check_auth</name>
+                <method><name>@check_access</name>
                     <desc>Декоратор для быстрой проверки прав доступа</desc>
                     <arg><name>auth</name>
                         <type>bool?</type>
