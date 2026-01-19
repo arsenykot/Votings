@@ -1,0 +1,52 @@
+{% extends "abc/alert_with_sidebar.html" %}
+{% block title %}An integrity error occured{%endblock%}
+{% block alert_title %}<i class="bi-exclamation-octagon-fill"></i> An integrity error occured</h1>{% endblock %}
+{% block alert_content %}
+<h3>Unable to verify the integrity of one of the static files. Did the file change?</h3>
+<h3>Please try forcefully refreshing the page by pressing <b>Ctrl + F5</b>, then try loading the page again.</h3>
+<br>
+<h6>If you modified the file, please update the <code>integrity</code> value of the updated element.</h5>
+<h6>To generate a new checksum digest, use the following command:</h5>
+<h6><code>openssl dgst -sha256 -binary static/FILE_NAME | openssl base64 -A</code></h5>
+<h6>Afterwards, modify the element:</h5>
+<h6><code>&lt;script src="&#123;&#37; static "FILE_NAME" &#37;&#125;" integrity="sha256-CHECKSUM_DIGEST_VALUE"&gt;&lt;/script&gt;</code></h5>
+<h6>The modified tag should look something like this:</h5>
+<h6><code>&lt;script src="&#123;&#37; static "util.js" &#37;&#125;" integrity="sha256-GufxbMf7OsVvsDYvhdMzVpt6iJUgjKj59KMp+bEAivU="&gt;&lt;/script&gt;</code></h5>
+<hr>
+<h6>The files that were also errored here (aka loaded globally):</h5>
+<ol id="error-container">
+</ol>
+<script>
+    let q = document.getElementById("error-container");
+    erroredAddressList.forEach(addr => {
+        let e = document.createElement("li");
+        let e2 = document.createElement("code");
+        e2.innerText = addr.src+"; context:";
+        let e3 = document.createElement("code");
+        e3.innerText = addr.lines.join("\n");
+        e.appendChild(e2);
+        e.innerHTML += "<br>";
+        e.appendChild(e3);
+        e.classList.add("mb-2");
+        q.appendChild(e);
+    });
+    if(erroredAddressList.length <= 0){
+        
+        let i1 = document.createElement("i");
+        i1.innerText = "None! The error is probably resolved now. If it is not, ";
+        let i2 = document.createElement("a");
+        i2.innerText = "click here to disable the redirect to this page";
+        i2.href = document.referrer+"#integrity_debug";
+        q.appendChild(i1);
+        q.appendChild(i2);
+    }
+    else{
+        let i2 = document.createElement("a");
+        i2.innerText = "Debug the page";
+        i2.href = document.referrer+"#integrity_debug";
+        q.appendChild(i2);
+    }
+    
+</script>
+<hr>
+{% endblock %}

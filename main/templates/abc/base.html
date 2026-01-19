@@ -1,11 +1,56 @@
 {% load static %}
+<script>
+    let erroredAddressList = [];
+        let observer = new MutationObserver(mutationRecords => {
+            mutationRecords.forEach(record => {
+                if(record.type!="childList") return;
+                record.addedNodes.forEach(node => {
+                    if(node instanceof HTMLScriptElement || node instanceof HTMLStyleElement){
+                        function scriptErrorDetected(e){
+                            let inDebug = window.location.href.includes("#integrity_debug");
+                            if(window.location.pathname != "/integrity" && !inDebug){
+                                window.location.replace("/integrity");
+                            }
+                            else{
+                                let siblings = Array.from(node.parentElement.children);
+                                let lindex = siblings.indexOf(node);
+                                let retLines = [];
+                                if(lindex > 0) retLines.push(siblings[lindex-1].outerHTML);
+                                retLines.push(siblings[lindex].outerHTML+"  <<< HERE");
+                                if(lindex+1 < siblings.length) retLines.push(siblings[lindex+1].outerHTML);
+                                erroredAddressList.push({
+                                    "src": node.src,
+                                    "lines": retLines
+                                });
+                                if(inDebug){
+                                    let errorID = node.integrity.slice(10, 20);
+                                    node.id = "error_"+errorID;
+                                    console.error("================","\nERRORING ELEMENT: \n",node,"\nERRORING ELEMENT ID: ",node.id,"\nQuery: document.querySelector('script#"+node.id+"')");
+                                    alert("Culprit: "+node.src+"\n================\nThe element as well as the ID was logged to the console");
+                                }
+                            }
+                        }
+                        function clearErrorDetector(e){
+                            node.removeEventListener("error", scriptErrorDetected);
+                        }
+                        node.addEventListener("error", scriptErrorDetected);
+                        node.addEventListener("load", clearErrorDetector);
+                    }
+                });
+            });
+        });
+        observer.observe(document, {
+            childList: true,
+            subtree: true
+        });
+</script>
 <html data-bs-theme="{% block theme %}dark{% endblock %}">
     <head>
         <meta charset="utf-8">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
         <link rel="stylesheet" href="{% static 'util.css' %}">
-        <script src="{% static 'util.js' %}"></script>
+        <script src="{% static 'util.js' %}" integrity="sha256-l+JYKNwAHUZMNgQB8u3JZc35Gm+rfQkbCMzxjh4pGbA="></script>
         <title>{% block title %}Simple Votings{% endblock %}</title>
         <div id="toast-container">
         </div>
