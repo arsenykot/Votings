@@ -2,7 +2,8 @@ from django.http import HttpResponse
 from main.util import *
 from main.models import *
 import json
-from datetime import date as dateobj, time as timeobj, datetime as dtobj
+from datetime import date as dateobj, time as timeobj, datetime as dtobj, timezone
+from zoneinfo import ZoneInfo
 from random import randint
 from django.contrib.auth import login
 
@@ -40,10 +41,11 @@ def voting_new_view(req):
     close = getPostOr(req, "close", False)
     date = getPostOr(req, "date", False)
     time = getPostOr(req, "time", False)
+    tz = getPostOr(req, "timezone", False)
     multi = getPostOr(req, "multichoice", "off")
     multi = (multi == "on")
 
-    if False in [name, options, close]:
+    if False in [name, options, close, tz]:
         return respond(400, "BADREQUEST")
     
     if not checkVars([
@@ -73,6 +75,7 @@ def voting_new_view(req):
             date = dateobj.fromisoformat(date)
             time = timeobj.fromisoformat(time)
             datetime = dtobj.combine(date, time)
+            datetime = dtobj.fromtimestamp(datetime.timestamp(), ZoneInfo(str(tz)))
             if datetime.timestamp() < datetime.now().timestamp():
                 return respond(400, "DATEINPAST")
         except ValueError:
@@ -96,6 +99,9 @@ def voting_edit_view(req, id:int):
     
     if req.user != voting.author:
         return respond(403, "FORBIDDEN")
+    
+    if voting.closed:
+        return respond(400, "CLOSED")
     
     name = getPostOr(req, "title", False)
     desc = getPostOr(req, "description", False)
@@ -127,6 +133,24 @@ def voting_edit_view(req, id:int):
         return respond(400, "TOOMANYOPTIONS")
 
     voting.options = options
+    voting.save()
+
+    return respond(200, "OK")
+
+@check_access(redir=False)
+def voting_close_view(req, id:int):
+    voting = Voting.objects.filter(id=id)
+    if len(voting) <= 0:
+        return respond(404, "NOTFOUND")
+    voting = voting[0]
+    
+    if req.user != voting.author:
+        return respond(403, "FORBIDDEN")
+    
+    if voting.closed:
+        return respond(400, "CLOSED")
+    
+    voting.closed = True
     voting.save()
 
     return respond(200, "OK")

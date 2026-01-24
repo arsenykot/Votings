@@ -45,13 +45,19 @@ def existing_voting_view(req, id:int):
     voting = voting[0]
     if voting.taken_down:
         return render(req, "votings/error/removed.html", status=403)
+    if voting.date_closed:
+        closing_time = voting.date_closed.ctime()
+    else:
+        closing_time = False
     return render(req, "votings/view.html", {
         "title": voting.name,
         "description": voting.description,
         "options": list(enumerate(voting.options)),
         "multichoice": voting.multichoice,
         "author": voting.author,
-        "id": id
+        "id": id,
+        "closed": voting.closed,
+        "closing_time": closing_time
     })
 
 def tos_page_view(req):

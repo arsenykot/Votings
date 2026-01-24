@@ -1,5 +1,7 @@
 from django.db.models import *
 
+import time
+
 from django.contrib.auth.models import AbstractUser
 
 class User(AbstractUser):
@@ -14,4 +16,16 @@ class Voting(Model):
     date_created = DateTimeField(auto_now=True)
     date_closed = DateTimeField(null=True, blank=True)
     taken_down = BooleanField(default=False)
+    closed = BooleanField(default=False)
+    
+    @classmethod
+    def from_db(cls, db, field_names, values):
+        voting = super().from_db(db, field_names, values)
+        voting.check_closing_time()
+        return voting
 
+    def check_closing_time(self):
+        if self.date_closed and self.date_closed.timestamp() < time.time():
+            self.closed = True
+            self.save()
+        print("closing time:", self.date_closed)

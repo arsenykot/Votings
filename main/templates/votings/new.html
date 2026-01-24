@@ -37,6 +37,7 @@
                     <div class="form-small" id="datetimeForm">
                         <input class="form-control top datetime" type="date" id="datetime1" name="date">
                         <input class="form-control bottom datetime" type="time" id="datetime2" name = "time">
+                        <input type="text" id="datetime3" name = "timezone" hidden value="">
                     </div>
                     <hr>
                     <i>By creating any content on this website, you agree with the <a href="/tos">Terms of Service</a>.</i>
@@ -85,6 +86,9 @@
                     }
                     radio1.addEventListener("input", radioUpdate);
                     radio2.addEventListener("input", radioUpdate);
+                    let timezone_input = document.getElementById("datetime3");
+                    console.log(Intl.DateTimeFormat().resolvedOptions().timeZone);
+                    timezone_input.value = Intl.DateTimeFormat().resolvedOptions().timeZone;
                     let optionBuilder = new OptionBuilderElement(document.getElementById("optionbuilder"));
                     for(let i = 0; i < 2; i++) optionBuilder.createNewOption();
                 </script>
