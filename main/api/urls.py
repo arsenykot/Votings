@@ -7,6 +7,7 @@ urlpatterns = [
     path('test_user/<str:arg>/', create_account_quick),
     path('voting/new', voting_new_view),
     path('voting/edit/<int:id>', voting_edit_view),
+    path('voting/close/<int:id>', voting_close_view),
     path('auth/', include("main.api.auth.urls")),
     path('registration/', include("main.api.registration.urls"))
 ]

@@ -30,8 +30,7 @@
             <label class="form-label">Description</label>
             <textarea class="form-control"
                       name="description"
-                      rows="3"
-                      required>{{ voting.description }}</textarea>
+                      rows="3">{{ voting.description }}</textarea>
           </div>
 
           <div class="form-check mb-3">
@@ -57,6 +56,10 @@
       </div>
     </div>
   </form>
+  <form method="post" action="/api/voting/close/{{voting.id}}" id="closeform">
+    {% csrf_token %}
+    <button class="btn btn-warning" type="subimit" id="close">Permanently close voting</button>
+  </form>
   </div>
 </div>
 <script>
@@ -80,6 +83,25 @@ document.getElementById("editform").onsubmit = buildAjaxFormHandler(function(res
       break;
       case "BADREQUEST":
       errorToast(false, "Invalid data specified.");
+      break;
+      case "CLOSED":
+      errorToast(false, "This voting is closed");
+      break;
+    }
+  }
+});
+document.getElementById("closeform").onsubmit = buildAjaxFormHandler(function(resp){
+  if(resp.status==200) window.location.replace("/votings/view/{{voting.id}}");
+  else{
+    switch (resp.content){
+      case "FORBIDDEN":
+      errorToast(false, "Insufficient permissions.");
+      break;
+      case "BADREQUEST":
+      errorToast(false, "Invalid data specified.");
+      break;
+      case "CLOSED":
+      errorToast(false, "This voting is already closed");
       break;
     }
   }
