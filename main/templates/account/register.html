@@ -64,6 +64,7 @@
         });
         document.getElementById("pwd1").addEventListener("input", function(e){
             if(document.querySelector("input#pwd1").value.length < 8){
+                errorToast("pwdtooshort", "Your password is too short. The minimal length is 8 characters.")
                 document.querySelector("input#pwd1").classList.add("is-invalid");
                 sbmt.disabled = true;
             }
@@ -88,13 +89,16 @@
             if(resp.status == 200) window.location.replace("{% if next %}{{next}}{% else %}/{%endif%}");
             else{
                 if(resp.content=="USERNAMETAKEN"){
-                    errorToast("letaken", "This username is already taken.");
+                    errorToast(false, "This username is already taken.");
                 }
                 else if(resp.content=="REGEX"){
-                    errorToast("leregex", "Your username contains illegal characters.")
+                    errorToast(false, "Your username contains illegal characters.")
+                }
+                else if(resp.content=="PWDSHORT"){
+                    errorToast(false, "Your password is too short. The minimal length is 8 characters.");
                 }
                 else{
-                    errorToast("legeneric_"+resp.content, "Something went wrong: <i>"+resp.content+"</i>");
+                    errorToast(false, "Something went wrong: <i>"+resp.content+"</i>");
                 }
             }
         });

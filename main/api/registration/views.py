@@ -30,8 +30,10 @@ def register_view(req):
         return respond(400, "REGEX")
     if user_exists(uname):
         return respond(400, "USERNAMETAKEN")
-    if len(uname) > 24 or len(uname) < 4 or len(passwd) < 8:
+    if len(uname) > 24 or len(uname) < 4:
         return respond(400, "BADREQUEST")
+    if len(passwd) < 8:
+        return respond(400, "PWDSHORT")
     if " " in uname:
         return respond(400, "BADREQUEST")
     
