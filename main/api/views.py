@@ -87,7 +87,38 @@ def voting_new_view(req):
 
 @check_access(redir=False)
 def voting_vote_view(req, id:int):
-    pass
+    choice = getPostOr(req, "choice", False)
+    if choice == False:
+        return respond(400,"BADREQUEST")
+    
+    voting = Voting.objects.filter(id=id)
+    if len(voting) <= 0:
+        return respond(404, "NOTFOUND" )
+    voting = voting[0]
+    if voting.multichoice:
+        try:
+            choice = json.loads(b64dec(choice))
+            for i,c in enumerate(choice):
+                if not checkVars([[int,c,0,len(voting.options)-1]]):
+                    return respond(400, "BADREQUEST")
+                choice[i] = int(c)
+        except:
+            return respond(400,"BADREQUEST")
+    else:
+        if checkVars([
+            [int, choice, 0, len(voting.options)]
+           ]):
+            choice = [int(choice)]
+        else:
+            return respond(400, "BADREQUEST")
+    vote = Vote.objects.filter(user=req.user, voting=voting)
+    if len(vote) <= 0:
+        vote = Vote(user=req.user, voting=voting, choice=choice)
+    else:
+        vote = vote[0]
+        vote.choice = choice
+    vote.save()
+    return respond(200, "OK")
 
 @check_access(redir=False)
 def voting_edit_view(req, id:int):

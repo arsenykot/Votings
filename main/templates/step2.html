@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>выбор варианта ответа</title>
+</head>
+<body>
+<p>Голосование: {{voting.title}}</p>
+  <form method="post">
+    {% csrf_token %}
+    {% for choice in choices %}
+    <p>
+        <input type="radio" name="choice" value="{{ choice.id }}" required>
+        {{ choice.text }}
+    </p>
+    {% endfor %}
+    <input type = "submit" value = "Send">
+  </form>
+</body>
+</html>

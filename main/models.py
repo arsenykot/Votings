@@ -29,3 +29,8 @@ class Voting(Model):
             self.closed = True
             self.save()
         print("closing time:", self.date_closed)
+
+class Vote(Model):
+    user = ForeignKey(User, on_delete=CASCADE)
+    voting = ForeignKey(Voting, on_delete=CASCADE)
+    choice = JSONField(default=list)

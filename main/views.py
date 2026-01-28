@@ -49,15 +49,26 @@ def existing_voting_view(req, id:int):
         closing_time = voting.date_closed.ctime()
     else:
         closing_time = False
+    checked = []
+    voted = False
+    if req.user.is_authenticated:
+        vote = Vote.objects.filter(user=req.user, voting=voting)
+        voted = len(vote) > 0
+        if voted:
+            checked = vote[0].choice
+    options = []
+    for i in range(len(voting.options)):
+        options.append((i, voting.options[i], i in checked))
     return render(req, "votings/view.html", {
         "title": voting.name,
         "description": voting.description,
-        "options": list(enumerate(voting.options)),
+        "options": options,
         "multichoice": voting.multichoice,
         "author": voting.author,
         "id": id,
         "closed": voting.closed,
-        "closing_time": closing_time
+        "closing_time": closing_time,
+        "voted": voted
     })
 
 def tos_page_view(req):

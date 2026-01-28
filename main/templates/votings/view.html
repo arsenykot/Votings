@@ -51,24 +51,26 @@
                         {% csrf_token %}
 
                         {% if multichoice %}
-                            <input type="text" name="option" id="multichoiceoptions" hidden>
+                            <input type="text" name="choice" id="multichoiceoptions" hidden>
                         {% endif %}
 
-                        {% for opt_id, option in options %}
+                        {% for opt_id, option,checked in options %}
                             {% if multichoice %}
                                 <label>
                                     <input type="checkbox"
                                            class="form-check-input close"
                                            onclick="rebuildOptionSelection();"
-                                           value="{{ opt_id }}">
+                                           value="{{ opt_id }}" 
+                                           {% if checked %}checked{%endif%}>
                                     {{ option }}
                                 </label>
                             {% else %}
                                 <label>
                                     <input type="radio"
                                            class="form-check-input close"
-                                           name="option"
-                                           value="{{ opt_id }}">
+                                           name="choice"
+                                           value="{{ opt_id }}"
+                                           {% if checked %}checked{%endif%}>
                                     {{ option }}
                                 </label>
                             {% endif %}
@@ -143,7 +145,7 @@
             .querySelectorAll("input");
 
         options.forEach(option => {
-            if(option.checked) selected.push(option.value);
+            if(option.checked) selected.push(parseInt(option.value));
         });
 
         document.getElementById("multichoiceoptions").value =
@@ -152,7 +154,10 @@
 
     document.getElementById("voteform").onsubmit =
         buildAjaxFormHandler(function(resp){
-            console.log(resp);
+            //console.log(resp);
+            //alert(JSON.stringify(resp));
+            if(resp.status == 200) spawnToast("success", "info", "Your vote has been recorded. Thank you.");
+            else errorToast(false, resp.content);
         });
 </script>
 
