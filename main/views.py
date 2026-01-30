@@ -70,8 +70,17 @@ def existing_voting_view(req, id:int):
         if voted:
             checked = vote[0].choice
     options = []
+    vote_count = len(voting.votes.all())
     for i in range(len(voting.options)):
-        options.append((i, voting.options[i], i in checked))
+        amount_of_votes = 0
+        for j in voting.votes.all():
+            if i in j.choice:
+                amount_of_votes += 1
+        if vote_count > 0:
+            percentage = int(amount_of_votes/vote_count*100)
+        else:
+            percentage = 0
+        options.append((i, voting.options[i], i in checked, percentage, amount_of_votes))
     return render(req, "votings/view.html", {
         "title": voting.name,
         "description": voting.description,
@@ -81,7 +90,9 @@ def existing_voting_view(req, id:int):
         "id": id,
         "closed": voting.closed,
         "closing_time": closing_time,
-        "voted": voted
+        "voted": voted,
+        "viewresults": voting.can_view_results,
+        "vote_count": len(voting.votes.all())
     })
 
 def tos_page_view(req):

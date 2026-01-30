@@ -45,6 +45,22 @@
     height: 160px;
 }
 
+.form-control.progress{
+    height: 20px;
+    width: 300px;
+    border-radius: 5px;
+    display: inline-block;
+    position: relative;
+    top: 4px;
+}
+.form-control.progress::-webkit-progress-bar {
+  border-radius: 5px;
+}
+.form-control.progress::-webkit-progress-value {
+  background-color: var(--bs-primary);
+  border-radius: 5px;
+}
+
 .tcenter{
     width: 100%;
     text-align: center;

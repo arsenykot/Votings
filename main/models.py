@@ -18,20 +18,23 @@ class Voting(Model):
     date_closed = DateTimeField(null=True, blank=True)
     taken_down = BooleanField(default=False)
     closed = BooleanField(default=False)
+    can_view_results = BooleanField(default=False)
     
     @classmethod
     def from_db(cls, db, field_names, values):
         voting = super().from_db(db, field_names, values)
-        voting.check_closing_time()
+        voting.check_close()
         return voting
 
-    def check_closing_time(self):
+    def check_close(self):
         if self.date_closed and self.date_closed.timestamp() < time.time():
             self.closed = True
-            self.save()
+        if self.closed:
+            self.can_view_results = True
+        self.save()
         #print("closing time:", self.date_closed)
 
 class Vote(Model):
     user = ForeignKey(User, on_delete=CASCADE)
-    voting = ForeignKey(Voting, on_delete=CASCADE)
+    voting = ForeignKey(Voting, on_delete=CASCADE, related_name='votes')
     choice = JSONField(default=list)
