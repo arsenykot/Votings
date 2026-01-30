@@ -1,13 +1,18 @@
 from main.util import *
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseForbidden
 from main.models import *
+import django
 import json
 
 @check_access(auth = False)
 def index_page_view(req):
-   return render(req, "index.html")
+    warn = False
+    if django.VERSION < (7,0):
+        ver = list(map(str, django.VERSION[:3]))
+        warn = ".".join(ver)
+    return render(req, "index.html", {"django_warning":warn})
 
 
 def login_page_view(req):
@@ -124,7 +129,15 @@ def test_page_view(req):
 
 @check_access()
 def account_settings_view(req):
-    return render(req, "account/settings.html", {})
+    utheme = req.user.preferred_theme
+    tpl = "<i class=\"bi bi-%s-fill\"></i> %s"
+    if utheme == "dark":
+        utheme = tpl%("moon", "Dark")
+    else:
+        utheme = tpl%("sun", "Light")
+    return render(req, "account/settings.html", {
+        "theme_block": utheme
+    })
 
 @check_access()
 def account_sessions_view(req):

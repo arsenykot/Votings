@@ -197,7 +197,7 @@ def voting_edit_view(req, id:int):
         return respond(403, "FORBIDDEN")
     
     if voting.closed:
-        return respond(400, "CLOSED")
+        return respond(423, "CLOSED")
     
     name = getPostOr(req, "title", False)
     desc = getPostOr(req, "description", False)
@@ -283,3 +283,27 @@ def search_view(req):
             if q[0] >= 1:
                 ret.append(q)
     return respond(200,json.dumps(ret))
+
+@check_access(redir=False)
+def settings_theme_view(req):
+    theme = getGetOr(req, "theme", False)
+    if not theme in ["light", "dark"]:
+        return respond(400, "BADREQUEST")
+    req.user.preferred_theme = theme
+    req.user.save()
+    return respond(200, "OK")
+        
+@check_access(redir=False)
+def settings_password_view(req):
+    passwd = getPostOr(req, "password", False)
+    if not checkVars([[str, passwd, 8]]):
+        return respond(400,"BADREQUEST")
+    req.user.set_password(passwd)
+    req.user.save()
+    return respond(200, "OK")
+
+@check_access()
+def delete_account(req):
+    req.user.delete()
+    return redirect("/")
+ 

@@ -10,6 +10,87 @@
 </div>
 
 <div class="row">
-    <h1>TODO!</h1>
+    <div class="col-12">
+        <h2>Website theme</h2>
+        <div class="dropdown">
+            <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                aria-expanded="false" id="selected-theme">
+                {{theme_block|safe}}
+            </button>
+            <ul class="dropdown-menu" id="theme-picker">
+                <li><a class="dropdown-item" href="#" data-theme="dark"><i class="bi bi-moon-fill"></i> Dark</a></li>
+                <li><a class="dropdown-item" href="#" data-theme="light"><i class="bi bi-sun-fill"></i> Light</a></li>
+            </ul>
+        </div>
+        <script>
+            let themeSelectors = document.querySelector("ul#theme-picker").querySelectorAll("a.dropdown-item");
+            let selectedTheme = document.querySelector("button#selected-theme");
+            function updateTheme(theme) {
+                let htmlElem = document.body.parentElement;
+                themeSelectors[0].parentElement.classList.remove("show");
+                selectedTheme.ariaDisabled = true;
+                ajaxGet("/api/settings/theme", function (resp) {
+                    if (resp.status == 200) spawnToast("success", "info", "Theme successfully updated");
+                    else errorToast(false, "An error occured when syncing settings. Please try again later.");
+                }, { "theme": theme });
+                htmlElem.classList.add("transitioning", "lock");
+                htmlElem.setAttribute("data-bs-theme", theme);
+                setTimeout(function () {
+                    htmlElem.classList.remove("transitioning", "lock");
+                    selectedTheme.disabled = false;
+                }, 500);
+            }
+            themeSelectors.forEach(sel => {
+                sel.addEventListener("click", function (e) {
+                    selectedTheme.innerHTML = sel.innerHTML;
+                    updateTheme(sel.getAttribute("data-theme"));
+                });
+            });
+        </script>
+        <br>
+        <h2>Change password</h2>
+        <form action="/api/settings/password" method="POST" class="w-25" id="pwdchangeform">
+            {% csrf_token %}
+            <input type="password" name="password" id="pwd1" class="form-control mb-1" placeholder="New password">
+            <input type="password" id="pwd2" class="form-control mb-1" placeholder="Repeat password">
+            <button type="submit" class="btn btn-danger w-100">Change password</button>
+        </form>
+        <script>
+            let fh = buildAjaxFormHandler(function (resp) {
+                if (resp.status == 200) {
+                    spawnToast("success", "info", "Password successfully updated. Please log in once again.");
+                }
+                else errorToast(false, resp.content);
+            });
+            pwdchangeform.onsubmit = function (e) {
+                e.preventDefault();
+                if (document.querySelector("input#pwd1").value.length < 8) errorToast(false, "Password is too short. Minimum length is 8 characters.");
+                else if (document.querySelector("input#pwd1").value != document.querySelector("input#pwd2").value) errorToast(false, "Passwords do not match");
+                else fh(e);
+            };
+        </script>
+        <h2>Account</h2>
+        <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deletemodal">Delete account</button>
+        <div class="modal" tabindex="-1" id="deletemodal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Delete account</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <b>Are you sure you want to delete your account?</b>
+                        <b>All of your votings and votes will be removed.</b>
+                        <br>
+                        <h4>This action is irreversible.</h4>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Do not</button>
+                        <a href="/api/settings/delete" class="btn btn-danger">Delete account</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

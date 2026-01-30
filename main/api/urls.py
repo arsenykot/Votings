@@ -11,6 +11,9 @@ urlpatterns = [
     path('voting/close/<int:id>', voting_close_view),
     path('voting/vote/<int:id>', voting_vote_view),
     path('search', search_view),
+    path('settings/theme', settings_theme_view),
+    path('settings/password', settings_password_view),
+    path('settings/delete', delete_account),
     path('auth/', include("main.api.auth.urls")),
     path('registration/', include("main.api.registration.urls"))
 ]

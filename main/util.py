@@ -2,13 +2,28 @@ from hashlib import sha256
 from time import time
 from main.models import User
 from django.http import HttpResponse
-from django.shortcuts import redirect
 from random import choice
 from string import ascii_letters
+from django.shortcuts import redirect, render as raw_render
 import re
 import base64
 
 USERNAME_RE_MATCH = re.compile(r"^([a-z0-9\.]{4,24})$")
+
+def render(
+    request, template_name, context=None, content_type=None, status=None, using=None
+):
+    if context == None:
+        context = {}
+    theme = "dark"
+    if request.user.is_authenticated:
+        theme = request.user.preferred_theme
+    ctx2 = {
+        "theme": theme 
+    }
+    for k in ctx2:
+        context[k] = ctx2[k]
+    return raw_render(request=request, template_name=template_name, context = context, content_type = content_type, status= status, using = using)
 
 def getArgumentOr(args, name, default):
     if(name in args.keys()):

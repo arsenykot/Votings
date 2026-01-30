@@ -6,6 +6,7 @@ from django.contrib.auth.models import AbstractUser
 
 class User(AbstractUser):
     is_banned = BooleanField(default=False, help_text="Specifies whether this user is banned and can not access the website.")
+    preferred_theme = CharField(default="dark")
 
 class Voting(Model):
     author = ForeignKey(User, on_delete=CASCADE, related_name='votings')

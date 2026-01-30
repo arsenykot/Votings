@@ -3,6 +3,18 @@
 <h1>Simple Votings</h1>
 <h4><i>Create simple public votings quickly and easily.</i></h4>
 <a class="btn btn-primary" id="create-button" style="max-width: 30vw;" href="/votings/new">Create a voting</a>
+{% comment %} {% if django_warning %}
+<div class="card bg-danger">
+    <div class="card-header">
+        <h1><i class="bi bi-skip-backward"></i> Outdated Django version!</h1>
+    </div>
+    <div class="card-body">
+        <h3>The detected version of Django (<code>{{django_warning}}</code>) is older than the recommended version (<code>6.0.0</code>).</h3>
+        <h3>Some of the app functions may be broken.</h3>
+        <h3>To ensure the best experience, please update Django to version 6.0.0</h3>
+    </div>
+</div>
+{% endif %} {% endcomment %}
 <hr>
 <form action="/api/search" method="POST" class="row align-items-center w-100" id="searchform" autocomplete="off">
   {% csrf_token %}

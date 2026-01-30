@@ -49,3 +49,9 @@
     width: 100%;
     text-align: center;
 }
+.transitioning *{
+    transition: 0.5s;
+}
+.lock *{
+    cursor: not-allowed;
+}
