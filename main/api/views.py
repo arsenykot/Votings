@@ -109,6 +109,8 @@ def voting_new_view(req):
     tz = getPostOr(req, "timezone", False)
     multi = getPostOr(req, "multichoice", "off")
     multi = (multi == "on")
+    view_res = getPostOr(req, "viewresults", "off")
+    view_res = (view_res == "on")
 
     if False in [name, options, close, tz]:
         return respond(400, "BADREQUEST")
@@ -146,7 +148,7 @@ def voting_new_view(req):
         except ValueError:
             return respond(400, "BADDATE")
     
-    voting = Voting(author=req.user, name=name, description=desc, options=options, date_closed=datetime, multichoice=(multi!=False))
+    voting = Voting(author=req.user, name=name, description=desc, options=options, date_closed=datetime, multichoice=(multi!=False), can_view_results=(view_res!=False))
     voting.save()
     return HttpResponse(str(voting.id))
 
@@ -202,17 +204,21 @@ def voting_edit_view(req, id:int):
     name = getPostOr(req, "title", False)
     desc = getPostOr(req, "description", False)
     multichoice = getPostOr(req, "multichoice", False)
-    if False in [name, multichoice]:
+    view_res = getPostOr(req, "viewresults", False)
+
+    if False in [name, multichoice, view_res]:
         return respond(400, "BADREQUEST")
     if not checkVars([
         [str, name, 1, 48],
         [str, desc, 0, 512],
-        [["on", "off"], multichoice]
+        [["on", "off"], multichoice],
+        [["on", "off"], view_res]
     ]):
         return respond(400, "BADREQUEST")
     voting.name = name
     voting.description = desc
     voting.multichoice = multichoice=="on"
+    voting.can_view_results = view_res=="on"
 
     raw_options = getPostOr(req, "options", False)
     try:
@@ -250,6 +256,8 @@ def voting_close_view(req, id:int):
     voting.save()
 
     return respond(200, "OK")
+
+
 @check_access(redir=False, auth=False)
 def search_view(req):
     q = trisplit(getPostOr(req, "query", "").lower())

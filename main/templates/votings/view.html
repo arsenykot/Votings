@@ -54,7 +54,7 @@
                             <input type="text" name="choice" id="multichoiceoptions" hidden>
                         {% endif %}
 
-                        {% for opt_id, option,checked in options %}
+                        {% for opt_id, option,checked, percentage, amount_of_votes in options %}
                             {% if multichoice %}
                                 <label>
                                     <input type="checkbox"
@@ -64,6 +64,15 @@
                                            {% if checked %}checked{%endif%}>
                                     {{ option }}
                                 </label>
+                                {% if viewresults %}
+                                <br>
+                                <label>
+                                    <progress class="form-control progress"
+                                              value="{{ percentage }}"
+                                              max="100">prog</progress>
+                                    {{ percentage }}% ({{ amount_of_votes }}/{{ vote_count }})
+                                </label>
+                                {% endif %}
                             {% else %}
                                 <label>
                                     <input type="radio"
@@ -73,10 +82,18 @@
                                            {% if checked %}checked{%endif%}>
                                     {{ option }}
                                 </label>
+                                {% if viewresults %}
+                                <br>
+                                <label>
+                                    <progress class="form-control progress"
+                                              value="{{ percentage }}"
+                                              max="100">prog</progress>
+                                    {{ percentage }}% ({{ amount_of_votes }}/{{ vote_count }})
+                                </label>
+                                {% endif %}
                             {% endif %}
                             <br>
                         {% endfor %}
-
                         <br>
                         {% if closed %}
                             <p>You cannot vote here as the voting has been closed<p>
