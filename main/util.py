@@ -128,5 +128,13 @@ def rstr(l):
         ret += choice(ascii_letters)
     return ret
 
+def trisplit(s):
+    if len(s) <= 3:
+        return [s]
+    ret = []
+    for i in range(1, len(s)-2):
+        ret.append(s[i-1:i+1])
+    return ret
+
 LOREM_IPSUM = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent iaculis erat eu libero efficitur, vel ultrices ipsum consequat. Cras finibus tincidunt mi, non eleifend orci."
 LOREM_IPSUM_B64 = "TG9yZW0gaXBzdW0gZG9sb3Igc2l0IGFtZXQsIGNvbnNlY3RldHVyIGFkaXBpc2NpbmcgZWxpdC4gUHJhZXNlbnQgaWFjdWxpcyBlcmF0IGV1IGxpYmVybyBlZmZpY2l0dXIsIHZlbCB1bHRyaWNlcyBpcHN1bSBjb25zZXF1YXQuIENyYXMgZmluaWJ1cyB0aW5jaWR1bnQgbWksIG5vbiBlbGVpZmVuZCBvcmNpLg=="

@@ -252,7 +252,7 @@ def voting_close_view(req, id:int):
     return respond(200, "OK")
 @check_access(redir=False, auth=False)
 def search_view(req):
-    q = set(getPostOr(req, "query", "").lower().split())
+    q = trisplit(getPostOr(req, "query", "").lower())
     ret = []
     hp = -1
     for voting in Voting.objects.all():
@@ -274,12 +274,12 @@ def search_view(req):
         if score > hp:
             hp = score
     ret = sorted(ret, key= lambda part: part[0], reverse = True)
-    if hp <= 0 and len(q) > 2:
+    if hp <= 0 and len(" ".join(q)) > 1:
         return respond(204,"")
     elif hp > 0:
         tmp = list(ret)
         ret = []
         for q in tmp:
-            if q[0] > 1:
+            if q[0] >= 1:
                 ret.append(q)
     return respond(200,json.dumps(ret))
