@@ -29,7 +29,7 @@ class Voting(Model):
         if self.date_closed and self.date_closed.timestamp() < time.time():
             self.closed = True
             self.save()
-        print("closing time:", self.date_closed)
+        #print("closing time:", self.date_closed)
 
 class Vote(Model):
     user = ForeignKey(User, on_delete=CASCADE)
