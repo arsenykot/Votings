@@ -3,6 +3,8 @@ from time import time
 from main.models import User
 from django.http import HttpResponse
 from django.shortcuts import redirect
+from random import choice
+from string import ascii_letters
 import re
 import base64
 
@@ -119,6 +121,12 @@ def b64dec(b64str):
 def b64enc(rawstr):
     encstr = base64.encodebytes(bytes(rawstr, encoding="utf-8")).decode(encoding="utf-8")
     return encstr.replace("\n","")
+
+def rstr(l):
+    ret = ""
+    for i in range(l):
+        ret += choice(ascii_letters)
+    return ret
 
 LOREM_IPSUM = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent iaculis erat eu libero efficitur, vel ultrices ipsum consequat. Cras finibus tincidunt mi, non eleifend orci."
 LOREM_IPSUM_B64 = "TG9yZW0gaXBzdW0gZG9sb3Igc2l0IGFtZXQsIGNvbnNlY3RldHVyIGFkaXBpc2NpbmcgZWxpdC4gUHJhZXNlbnQgaWFjdWxpcyBlcmF0IGV1IGxpYmVybyBlZmZpY2l0dXIsIHZlbCB1bHRyaWNlcyBpcHN1bSBjb25zZXF1YXQuIENyYXMgZmluaWJ1cyB0aW5jaWR1bnQgbWksIG5vbiBlbGVpZmVuZCBvcmNpLg=="

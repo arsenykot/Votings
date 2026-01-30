@@ -4,6 +4,7 @@ from main.models import *
 import json
 from datetime import date as dateobj, time as timeobj, datetime as dtobj, timezone
 from zoneinfo import ZoneInfo
+from string import ascii_letters
 from random import randint
 from django.contrib.auth import login
 
@@ -31,6 +32,70 @@ def create_account_quick(req, arg:str):
     u.set_password("1234567890")
     u.save()
     login(req, u)
+    return redirect("/test")
+
+#Под удаление перед релизом
+def test_search_view(req):
+    user1 = User(username=rstr(16))
+    user2 = User(username=rstr(16))
+    user1.save()
+    user2.save()
+    SAMPLE_VOTINGS = [
+        [
+            "Lorem Ipsum",
+            LOREM_IPSUM,
+            ["Option A", "Option B"],
+            False,
+            ["2026-01-01 12:34", "2026-01-31 23:59"],
+            user2
+        ],
+        [
+            "Locked voting",
+            "You will not be able to vote here",
+            ["Option A", "Option B"],
+            True,
+            ["1970-01-01 12:34", "1970-01-31 23:59"],
+            user2
+        ],
+        [
+            "Best keyboard layout",
+            "Which keyboard layout is better?",
+            ["QWERTY", "Dvorak", "Colemak"],
+            False,
+            ["2026-01-01 12:34", "2026-01-31 23:59"],
+            user1
+        ],
+        [
+            "Test voting 123",
+            LOREM_IPSUM,
+            ["Option A", "Option B"],
+            False,
+            ["2026-01-01 12:34", "2026-01-31 23:59"]
+        ]
+    ]
+    for i in range(32):
+        k = user2
+        if i %4 == 0:
+            k = user1
+        SAMPLE_VOTINGS.append([
+            "Lorem Ipsum "+str(i),
+            LOREM_IPSUM,
+            ["Option A", "Option B"],
+            False,
+            ["2026-01-01 12:34", "2026-01-31 23:59"],
+             k
+        ])
+    for voting in SAMPLE_VOTINGS:
+        u = req.user
+        if len(voting) > 5:
+            u = voting[5]
+        times = voting[4]
+        stime = dtobj.fromisoformat(times[0])
+        etime = None
+        if len(times) > 1:
+            etime = dtobj.fromisoformat(times[1])
+        vobj = Voting(author=u, name=voting[0], description=voting[1], options=voting[2], multichoice=voting[3], date_created = stime, date_closed = etime)
+        vobj.save()
     return redirect("/test")
 
 @check_access(redir=False)
@@ -185,3 +250,36 @@ def voting_close_view(req, id:int):
     voting.save()
 
     return respond(200, "OK")
+@check_access(redir=False, auth=False)
+def search_view(req):
+    q = set(getPostOr(req, "query", "").lower().split())
+    ret = []
+    hp = -1
+    for voting in Voting.objects.all():
+        score = 0
+        for word in q:
+            score += voting.name.lower().count(word)
+            score += voting.description.lower().count(word)
+        t = voting.date_created.strftime("%H:%M:%S %d/%m/%Y")
+        if voting.date_closed != None:
+            t += " - " + voting.date_closed.strftime("%H:%M:%S %d/%m/%Y")
+        else:
+            t = "Created at " + t
+        ret.append((score,{
+            "name": voting.name,
+            "description": voting.description,
+            "id": voting.id,
+            "time": t
+            }))
+        if score > hp:
+            hp = score
+    ret = sorted(ret, key= lambda part: part[0], reverse = True)
+    if hp <= 0 and len(q) > 2:
+        return respond(204,"")
+    elif hp > 0:
+        tmp = list(ret)
+        ret = []
+        for q in tmp:
+            if q[0] > 1:
+                ret.append(q)
+    return respond(200,json.dumps(ret))

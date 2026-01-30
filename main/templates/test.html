@@ -45,7 +45,17 @@
 <a class="btn btn-danger" style="max-width: 30vw;" href="/api/test_user/staff/">new staff</a>
 <a class="btn btn-danger" style="max-width: 30vw;" href="/api/test_user/su/">new superuser</a>
 <a class="btn btn-danger" href="javascript:banself();">Ban current account</a>
+<h2>Search test</h2>
+<a class="btn btn-primary" href="/api/test_search">Create sample data</a>
+<h2>Sandbox</h2>
+<textarea id="sbedit" class="w-100">
+</textarea>
+<div id="sbview">
+</div>
 <script>
+sbedit.addEventListener("change", function(e){
+  sbview.innerHTML = sbedit.value;
+});
 function banself(){
     ajaxGet("/api/ban_self", function(resp){
         if(resp.status == 200) spawnToast("success", "info", resp.content);

@@ -4,15 +4,102 @@
 <h4><i>Create simple public votings quickly and easily.</i></h4>
 <a class="btn btn-primary" id="create-button" style="max-width: 30vw;" href="/votings/new">Create a voting</a>
 <hr>
-<form action="/api/search" method="POST" class="row align-items-center w-100">
-    <div class="col-sm-6 col-md-8">
-        <input class="form-control" type="text" name="query" placeholder="Search...">
-    </div>
-    <div class="col-6 col-md-4">
-        <button class="btn btn-primary" type="submit">Search</button>
-    </div>
+<form action="/api/search" method="POST" class="row align-items-center w-100" id="searchform">
+  {% csrf_token %}
+  <input class="form-control w-75" type="text" name="query" placeholder="Search...">
+  <button class="btn btn-primary w-25" type="submit" id="searchbtn">Search</button>
 </form>
-<div id="searchresults">
-    <h1>TODO!</h1>
+<div id="searchnav" class="w-100">
+  <a href="#" class="badge bg-primary text-decoration-none me-2" style="font-size: large;">1</a>
+  <a href="#" class="badge text-decoration-none me-2" style="font-size: large;">2</a>
 </div>
+<div id="searchresults" class="list-group list-group-flush">
+  <i>Loading...</i>
+</div>
+<script>
+  searchform.addEventListener("submit", function (e) {
+    e.preventDefault();
+    setSpinner(searchresults, "Loading...");
+  })
+  let buf = [];
+  function processResults(page) {
+    setSpinner(searchresults, "Processing...");
+    let nc = document.createElement("div");
+    page -= 1;
+    for (let i = 0; i < 10; i++) {
+      let id = (page * 10) + i;
+      if (id >= 0 && id < buf.length) {
+        let voting = buf[id][1];
+        let votElem = document.createElement("div");
+        votElem.classList.add("list-group-item", "px-0", "d-flex", "w-100", "justify-content-between", "align-items-start");
+        let container = document.createElement("div");
+        container.classList.add("flex-grow-1");
+        let title = document.createElement("h6");
+        let lnk = document.createElement("a");
+        lnk.innerText = voting.name;
+        lnk.classList.add("text-decoration-none");
+        lnk.href = "/votings/view/"+voting.id;
+        lnk.target = "_blank";
+        title.classList.add("mb-1");
+        title.appendChild(lnk);
+        let desc = document.createElement("p");
+        desc.classList.add("mb-1","text-body-secondary","small");
+        desc.innerText = voting.description;
+        let votingPeriod = document.createElement("p");
+        votingPeriod.classList.add("text-secondary");
+        votingPeriod.innerText = voting.time;
+        container.append(title, desc);
+        votElem.appendChild(container);
+        nc.appendChild(votElem);
+      }
+      else break;
+    }
+    searchresults.innerHTML = nc.innerHTML;
+  }
+  function makenav(text, page, selected){
+    let nav = document.createElement("a");
+    nav.innerText = text;
+    nav.classList.add("badge", "text-decoration-none", "me-2");
+    if(selected) nav.classList.add("bg-primary");
+    nav.style.fontSize = "large";
+    nav.addEventListener("click", function(e){
+      processResults(page);
+      buildSearchNavigator(page);
+    });
+    nav.href="#";
+    return nav;
+  }
+  function buildSearchNavigator(selected_page){
+    let totalpages = Math.ceil(buf.length/10);
+    let sp = (selected_page > 3 ? selected_page - 2 : 1);
+    let ep = Math.min(sp + 5, totalpages);
+    let nav = document.getElementById("searchnav");
+    Array.from(nav.children).forEach(e=>{e.remove()});
+    if(sp != 1){
+      nav.appendChild(makenav("<<", 1, false));
+    }
+    for(let k = sp; k <= ep; k++){
+      nav.appendChild(makenav(k, k, k==selected_page));
+    }
+    if(ep!=totalpages){
+      nav.appendChild(makenav(">>", totalpages, false));
+    }
+  }
+  searchform.addEventListener("submit", buildAjaxFormHandler(function (resp) {
+    if (resp.status == 200) {
+      buf = JSON.parse(resp.content);
+      if(buf.length<=0){
+        searchresults.innerHTML = "<i>Nothing was found</i>";
+      }
+      else{
+         processResults(1);
+         buildSearchNavigator(1);
+      }
+    }
+    else if (resp.status == 204) {
+      searchresults.innerHTML = "<i>Nothing was found</i>";
+    }
+  }));
+  searchbtn.click();
+</script>
 {% endblock %}
