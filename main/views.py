@@ -41,8 +41,13 @@ def register_page_view(req):
 @check_access()
 def profile_page_view(req):
     user_votings = Voting.objects.filter(author=req.user, taken_down=False).order_by('-date_created')
+    participated_votings = Voting.objects.filter(
+        vote__user=req.user,
+        taken_down=False
+    ).order_by('-date_created')
     return render(req, "account/profile.html", {
-        "user_votings": user_votings
+        "user_votings": user_votings,
+        "participated_votings": participated_votings
     })
 
 @check_access(auth=False)

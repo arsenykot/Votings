@@ -186,6 +186,14 @@ def voting_vote_view(req, id:int):
     return respond(200, "OK")
 
 @check_access(redir=False)
+def voting_unvote_view(req, id:int):
+    voting = Voting.objects.filter(id=id)
+    voting = voting[0]
+    vote = Vote.objects.filter(user=req.user, voting=voting)
+    vote.delete()
+    return respond(200, "OK")
+
+@check_access(redir=False)
 def voting_edit_view(req, id:int):
     voting = Voting.objects.filter(id=id)
     totalChangedChars = 0 # todo: ограничить максимальное число модификаций
