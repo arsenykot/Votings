@@ -87,11 +87,20 @@
                             {% if user.is_authenticated and author == user%}
                                 {# автор не голосует #}
                             {% elif user.is_authenticated %}
-                                <button type="submit"
-                                        data-spinner-text="Submitting your vote..."
-                                        class="btn btn-primary">
-                                    {% if voted %}Change vote{% else %}Vote{% endif %}
-                                </button>
+                                <div class="d-flex gap-2">
+                                    <button type="submit"
+                                            data-spinner-text="Submitting your vote..."
+                                            id = "voteBtn"
+                                            class="btn btn-primary">
+                                        {% if voted %}Change vote{% else %}Vote{% endif %}
+                                    </button>
+                                    <button
+                                                class="btn btn-outline-danger"
+                                                id="unvote-btn"
+                         {% if not voted %}hidden{% endif %}
+                          data-spinner-text="Removing..."
+                                          >Remove vote</button>
+                                </div>
                             {% else %}
                                 <i>
                                     <a href="/account/login?next=/votings/view/{{ id }}">
@@ -156,9 +165,33 @@
         buildAjaxFormHandler(function(resp){
             //console.log(resp);
             //alert(JSON.stringify(resp));
-            if(resp.status == 200) spawnToast("success", "info", "Your vote has been recorded. Thank you.");
+            if(resp.status == 200){
+                spawnToast("success", "info", "Your vote has been recorded. Thank you.");
+                //window.location.reload();
+                unvoteBtn.hidden = false;
+                voteBtn.innerText = "Change vote";
+            }
             else errorToast(false, resp.content);
         });
+
+    let unvoteBtn = document.getElementById("unvote-btn");
+    unvoteBtn.addEventListener("click", (event) => {
+        event.preventDefault();
+        unvoteBtn.disabled = true;
+        let csrf = document.querySelector("#voteform input[name=csrfmiddlewaretoken]").value;
+        ajaxPost("/api/voting/unvote/{{ id }}", function(resp){
+            if(resp.status == 200){
+                spawnToast("success", "info", "Your vote has been removed.");
+                //window.location.reload();
+                unvoteBtn.hidden = true;
+                voteBtn.innerText = "Vote";
+            }
+            else{
+                errorToast(false, resp.content);
+                unvoteBtn.disabled = false;
+            }
+        }, {}, true, [["X-CSRFToken", csrf]]);
+    });
 </script>
 
 {% endblock %}

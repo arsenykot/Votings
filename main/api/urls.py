@@ -10,6 +10,7 @@ urlpatterns = [
     path('voting/edit/<int:id>', voting_edit_view),
     path('voting/close/<int:id>', voting_close_view),
     path('voting/vote/<int:id>', voting_vote_view),
+    path('voting/unvote/<int:id>', voting_unvote_view),
     path('search', search_view),
     path('settings/theme', settings_theme_view),
     path('settings/password', settings_password_view),

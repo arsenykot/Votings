@@ -138,11 +138,47 @@
                 <h5 class="mb-0">
                     <i class="bi bi-list-check"></i>
                     Votings you participated in
-                    <span class="badge bg-secondary ms-2">{{ user_votings|length }}</span>
+                    <span class="badge bg-secondary ms-2">{{ participated_votings|length }}</span>
                 </h5>
             </div>
             <div class="card-body overflow-y-scroll">
-                <h1>Placeholder, not implemented</h1>
+                {% if participated_votings %}
+                    <div class="list-group list-group-flush">
+                        {% for voting in participated_votings %}
+                        <div class="list-group-item px-0">
+                            <div class="d-flex w-100 justify-content-between align-items-start">
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1">
+                                        <a href="/votings/view/{{ voting.id }}" class="text-decoration-none">
+                                            {{ voting.name }}
+                                        </a>
+                                    </h6>
+                                    <p class="mb-1 text-body-secondary small">
+                                        {{ voting.description|truncatewords:20 }}
+                                    </p>
+                                    <small class="text-body-secondary">
+                                        <i class="bi bi-person"></i>
+                                        Author: {{ voting.author.username }}
+                                        <br>
+                                        <i class="bi bi-calendar3"></i>
+                                        Created: {{ voting.date_created|date:"M d, Y H:i" }}
+                                        {% if voting.date_closed %}
+                                        <br>
+                                        <i class="bi bi-clock"></i>
+                                        Closes: {{ voting.date_closed|date:"M d, Y H:i" }}
+                                        {% endif %}
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-body-secondary mb-0">
+                        <i class="bi bi-inbox"></i>
+                        User haven't participated in any votings yet.
+                    </p>
+                {% endif %}
             </div>
         </div>
     </div>
