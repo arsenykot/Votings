@@ -42,7 +42,7 @@ def register_page_view(req):
 def profile_page_view(req):
     user_votings = Voting.objects.filter(author=req.user, taken_down=False).order_by('-date_created')
     participated_votings = Voting.objects.filter(
-        vote__user=req.user,
+        votes__user=req.user,
         taken_down=False
     ).order_by('-date_created')
     return render(req, "account/profile.html", {

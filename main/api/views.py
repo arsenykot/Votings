@@ -271,7 +271,7 @@ def search_view(req):
     q = trisplit(getPostOr(req, "query", "").lower())
     ret = []
     hp = -1
-    for voting in Voting.objects.all():
+    for voting in Voting.objects.all().order_by('-date_created'):
         score = 0
         for word in q:
             score += voting.name.lower().count(word)
@@ -289,7 +289,7 @@ def search_view(req):
             }))
         if score > hp:
             hp = score
-    ret = sorted(ret, key= lambda part: part[0], reverse = True)
+    ret = sorted(ret, key= lambda part: [hp-part[0], part[1]["id"]], reverse = True)
     if hp <= 0 and len(" ".join(q)) > 1:
         return respond(204,"")
     elif hp > 0:
