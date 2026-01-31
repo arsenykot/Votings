@@ -42,7 +42,7 @@ def register_page_view(req):
 def profile_page_view(req):
     user_votings = Voting.objects.filter(author=req.user, taken_down=False).order_by('-date_created')
     participated_votings = Voting.objects.filter(
-        votes__user=req.user,
+        vote__user=req.user,
         taken_down=False
     ).order_by('-date_created')
     return render(req, "account/profile.html", {
@@ -178,3 +178,13 @@ def voting_edit(req, id: int):
 
 def integrity_error_view(req):
     return render(req, "integrity.html")
+
+def other_user_profile(req, id):
+    user = User.objects.filter(id=id)
+    if len(user) <= 0:
+        return render(req, "account/profile_404.html")
+    user = user[0]
+    return render(req, "account/profile_other.html", {
+        "user": user,
+        "user_votings": Voting.objects.filter(author=user)
+    })

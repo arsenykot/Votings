@@ -1,0 +1,98 @@
+{% extends "abc/with_sidebar.html" %}
+{% block content %}
+    <div class="row w-100">
+        <div class="col-12">
+            <h1 class="mb-4">
+                <i class="bi bi-person-circle"></i>
+                Profile of {{user.username}}
+            </h1>
+        </div>
+    </div>
+
+    <div class="col-md-8 col-lg-6 w-100" style="height: 80vh;">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-info-circle"></i>
+                    Account Information
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-0">
+                    <label class="form-label text-body-secondary mb-0">Username</label>
+                    <div class="form-control-plaintext fw-bold">{{ user.username }}</div>
+                </div>
+                <div class="mb-0">
+                    <label class="form-label text-body-secondary mb-0">Date Joined</label>
+                    <div class="form-control-plaintext">
+                        <i class="bi bi-calendar3"></i>
+                        {{ user.date_joined|date:"F d, Y" }}
+                    </div>
+                </div>
+                {% if user.is_staff %}
+                <div class="mb-3">
+                    <span class="badge bg-warning text-dark">
+                        <i class="bi bi-shield-check"></i>
+                        Staff Member
+                    </span>
+                </div>
+                {% endif %}
+                {% if user.is_superuser %}
+                <div class="mb-3">
+                    <span class="badge bg-danger">
+                        <i class="bi bi-shield-fill-check"></i>
+                        Administrator
+                    </span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="card mb-4 mh-50 d-block">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-list-check"></i>
+                    {{user.username}}'s votings
+                    <span class="badge bg-secondary ms-2">{{ user_votings|length }}</span>
+                </h5>
+            </div>
+            <div class="card-body overflow-y-scroll h-75">
+                {% if user_votings %}
+                    <div class="list-group list-group-flush h-50">
+                        {% for voting in user_votings %}
+                        <div class="list-group-item px-0">
+                            <div class="d-flex w-100 justify-content-between align-items-start">
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1">
+                                        <a href="/votings/view/{{ voting.id }}" class="text-decoration-none" target="_blank">
+                                            {{ voting.name }}
+                                        </a>
+                                    </h6>
+                                    <p class="mb-1 text-body-secondary small">
+                                        {{ voting.description|truncatewords:20 }}
+                                    </p>
+                                    <small class="text-body-secondary">
+                                        <i class="bi bi-calendar3"></i>
+                                        Created: {{ voting.date_created|date:"M d, Y H:i" }}
+                                        {% if voting.date_closed %}
+                                        <br>
+                                        <i class="bi bi-clock"></i>
+                                        Closes: {{ voting.date_closed|date:"M d, Y H:i" }}
+                                        {% endif %}
+                                        <span class="badge bg-primary ms-2">{{voting.votes|length}} votes</span>
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-body-secondary mb-0">
+                        <i class="bi bi-inbox"></i>
+                        {{user.username}} hasn't created any votings yet.
+                    </p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
