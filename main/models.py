@@ -39,3 +39,7 @@ class Vote(Model):
     user = ForeignKey(User, on_delete=CASCADE)
     voting = ForeignKey(Voting, on_delete=CASCADE, related_name='votes')
     choice = JSONField(default=list)
+
+class Complaint(Model):
+    user = ForeignKey(User, on_delete=CASCADE)
+    voting = ForeignKey(Voting, on_delete=CASCADE)

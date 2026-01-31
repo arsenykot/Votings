@@ -9,4 +9,6 @@ def users_list(req):
     return render(req, "staff/users.html")
 
 def reports_list(req):
-    return respond(501, "Not yet implemented")
+    if not req.user.is_staff:
+        return redirect("/")
+    return render(req, "staff/reports.html")

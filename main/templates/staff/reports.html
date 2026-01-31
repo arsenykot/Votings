@@ -1,0 +1,127 @@
+{% extends "abc/with_sidebar.html" %}
+{% block title %}Simple Votings Staff{% endblock %}
+
+{% block content %}
+<div class="row">
+    <h1>Reports list</h1>
+    <form action="/api/staff/reports" method="POST" class="row align-items-center w-100" id="searchform" autocomplete="off">
+        {% csrf_token %}
+        <button class="btn btn-primary w-25" type="submit" id="searchbtn">Refresh list</button>
+    </form>
+    <div id="searchnav" class="w-100">
+    </div>
+    <div id="searchresults" class="list-group list-group-flush">
+        <i>Loading...</i>
+    </div>
+    <script>
+        searchform.addEventListener("submit", function (e) {
+            e.preventDefault();
+            setSpinner(searchresults, "Loading...");
+        });
+        let buf = [];
+        function processResults(page) {
+            setSpinner(searchresults, "Processing...");
+            let nc = document.createElement("div");
+            page -= 1;
+            for (let i = 0; i < 10; i++) {
+            let id = (page * 10) + i;
+            if (id >= 0 && id < buf.length) {
+                let report = buf[id];
+                let uElem = document.createElement("div");
+                uElem.classList.add("list-group-item", "px-0", "d-flex", "w-100", "justify-content-between", "align-items-start");
+                let container = document.createElement("div");
+                container.classList.add("flex-grow-1");
+                let reporter = document.createElement("h6");
+                reporter.innerText = "Reported by ";
+                let lnk = document.createElement("a");
+                lnk.innerText = report.reporter.name;
+                lnk.classList.add("text-decoration-none");
+                lnk.href = "/user/"+report.reporter.id;
+                lnk.target = "_blank";
+                reporter.classList.add("mb-1");
+                reporter.appendChild(lnk);
+                let reportedVoting = document.createElement("h6");
+                reportedVoting.innerText = "Reported voting: ";
+                let lnk2 = document.createElement("a");
+                lnk2.href = "/votings/view/"+report.voting.id;
+                lnk2.target = "_blank";
+                lnk2.innerText = report.voting.name;
+                reportedVoting.appendChild(lnk2);
+                let btns = document.createElement("div");
+                let delReportButton = document.createElement("button");
+                delReportButton.classList.add("btn", "btn-danger");
+                delReportButton.innerHTML = "<i class='bi bi-check'></i> Report acknowledged";
+                delReportButton.addEventListener("click", function(e){
+                    ajaxGet("/api/staff/delreport/"+report.id,function(resp){
+                        if(resp.status == 200){
+                            delReportButton.parentElement.parentElement.remove();
+                            spawnToast("success", "info", "Report marked as acknowledged and removed from database.");
+                        }
+                        else{
+                            errorToast(false, "An internal error occured.");
+                        }
+                    });
+                });
+                container.append(reporter, reportedVoting, delReportButton);
+                uElem.appendChild(container);
+                nc.appendChild(uElem);
+            }
+            else break;
+        }
+        Array.from(searchresults.children).forEach(e=>{
+            e.remove();
+        });
+        Array.from(nc.children).forEach(e=>{
+            searchresults.appendChild(e);
+        })
+    }
+    function makenav(text, page, selected){
+        let nav = document.createElement("a");
+        nav.innerText = text;
+        nav.classList.add("badge", "text-decoration-none", "me-2");
+        if(selected) nav.classList.add("bg-primary");
+        nav.style.fontSize = "large";
+        nav.addEventListener("click", function(e){
+            processResults(page);
+            buildSearchNavigator(page);
+        });
+        nav.href="#";
+        return nav;
+    }
+    function buildSearchNavigator(selected_page){
+        let totalpages = Math.ceil(buf.length/10);
+        let sp = (selected_page > 3 ? selected_page - 2 : 1);
+        let ep = Math.min(sp + 5, totalpages);
+        let nav = document.getElementById("searchnav");
+        Array.from(nav.children).forEach(e=>{e.remove()});
+        if(sp != 1){
+            nav.appendChild(makenav("<<", 1, false));
+        }
+        for(let k = sp; k <= ep; k++){
+            nav.appendChild(makenav(k, k, k==selected_page));
+        }
+        if(ep!=totalpages){
+            nav.appendChild(makenav(">>", totalpages, false));
+        }
+    }
+    searchform.addEventListener("submit", buildAjaxFormHandler(function (resp) {
+        if (resp.status == 200) {
+            buf = JSON.parse(resp.content);
+            if(buf.length<=0){
+                searchresults.innerHTML = "<i>Nothing was found</i>";
+                document.getElementById("searchnav").innerHTML = "";
+            }
+            else{
+                processResults(1);
+                buildSearchNavigator(1);
+            }
+        }
+        else if (resp.status == 204) {
+            searchresults.innerHTML = "<i>Nothing was found</i>";
+            document.getElementById("searchnav").innerHTML = "";
+        }
+    }));
+    searchbtn.click();
+</script>
+</div>
+{% endblock %}

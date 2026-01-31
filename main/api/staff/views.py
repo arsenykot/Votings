@@ -38,6 +38,11 @@ def banuser(req, id):
     return respond(200, "OK")
 
 @check_access(redir=False)
+def banuser_quick(req, id, back):
+    banuser(req, id)
+    return redirect("/votings/view/"+str(back))
+
+@check_access(redir=False)
 def unbanuser(req, id):
     if not req.user.is_staff:
         return respond(403, "FORBIDDEN")
@@ -72,3 +77,37 @@ def users(req):
             }
         )
     return respond(200, json.dumps(ret))
+
+@check_access(redir=False)
+def list_reports(req):
+    if not req.user.is_staff:
+        return respond(403, "FORBIDDEN")
+
+    ret = []
+    for report in Complaint.objects.all():
+        ret.append(
+            {
+                "reporter": {
+                    "name": report.user.username,
+                    "id": report.user.id
+                },
+                "voting": {
+                    "name": report.voting.name,
+                    "id": report.voting.id
+                },
+                "id": report.id
+            }
+        )
+    return respond(200, json.dumps(ret))
+
+@check_access(redir=False)
+def remove_report(req, id):
+    if not req.user.is_staff:
+        return respond(403, "FORBIDDEN")
+    
+    report = Complaint.objects.filter(id=id)
+    if len(report) < 1:
+        return respond(404, "NOTFOUND")
+    report = report[0]
+    report.delete()
+    return respond(200, "OK")

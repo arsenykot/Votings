@@ -338,3 +338,16 @@ def delete_account(req):
     req.user.delete()
     return redirect("/")
  
+@check_access()
+def report_voting(req, id):
+    user = req.user
+    voting = Voting.objects.filter(id=id)
+    if len(voting) < 1:
+        return respond(404, "NOTFOUND")
+    voting = voting[0]
+    report = Complaint.objects.filter(user=user, voting=voting)
+    if len(report) >= 1:
+        return respond(400, "ALREADYREPORTED")
+    report = Complaint(user=user, voting=voting)
+    report.save()
+    return respond(200, "OK")
