@@ -1,9 +1,4 @@
 {% extends "abc/with_sidebar.html" %}
-{% partialdef tests_view %}
-{% for test in tests %}
-<li class="mb-0 mt-0"><p class="mb-0 mt-0">{{ test.0 }}: {% if test.1 %}<span class="text-success">PASS</span>{% else %}<span class="text-danger">FAIL</span>{% endif %}</p></li>
-{% endfor %}
-{% endpartialdef %}
 {% block title %}Simple Votings Unit Testing{% endblock %}
 {% block content %}
 <h1>Unit Testing</h1>
@@ -29,7 +24,9 @@
 </a>
 <ol class="collapse" id="cvTestsCollapse">
     {% with tests=checkvars_tests %}
-    {% partial tests_view %}
+    {% for test in tests %}
+<li class="mb-0 mt-0"><p class="mb-0 mt-0">{{ test.0 }}: {% if test.1 %}<span class="text-success">PASS</span>{% else %}<span class="text-danger">FAIL</span>{% endif %}</p></li>
+{% endfor %}
     {% endwith %}
 </ol>
 <a class="btn btn-primary" data-bs-toggle="collapse" href="#" data-bs-target="#b64TestsCollapse" role="button" aria-expanded="false" aria-controls="b64TestsCollapse">
@@ -37,7 +34,9 @@
 </a>
 <ol class="collapse" id="b64TestsCollapse">
     {% with tests=base64_tests %}
-    {% partial tests_view %}
+    {% for test in tests %}
+<li class="mb-0 mt-0"><p class="mb-0 mt-0">{{ test.0 }}: {% if test.1 %}<span class="text-success">PASS</span>{% else %}<span class="text-danger">FAIL</span>{% endif %}</p></li>
+{% endfor %}
     {% endwith %}
 </ol>
 <h2>Accounts test</h2>
