@@ -173,7 +173,8 @@ def voting_edit(req, id: int):
 
     return render(req, "votings/edit.html", {
         "voting": voting,
-        "options": b64enc(json.dumps(voting.options))
+        "options": b64enc(json.dumps(voting.options)),
+        "desc_limit": voting.description_limit
     })
 
 def integrity_error_view(req):

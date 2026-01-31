@@ -12,6 +12,7 @@ class Voting(Model):
     author = ForeignKey(User, on_delete=CASCADE, related_name='votings')
     name = CharField(max_length=48)
     description = CharField(max_length=512)
+    description_limit = IntegerField(null=True, blank=True)
     options = JSONField(default=list)
     multichoice = BooleanField(default=False)
     date_created = DateTimeField(auto_now=True)

@@ -147,8 +147,17 @@ def voting_new_view(req):
                 return respond(400, "DATEINPAST")
         except ValueError:
             return respond(400, "BADDATE")
-    
-    voting = Voting(author=req.user, name=name, description=desc, options=options, date_closed=datetime, multichoice=(multi!=False), can_view_results=(view_res!=False))
+
+    voting = Voting(
+        author=req.user,
+        name=name,
+        description=desc,
+        options=options,
+        date_closed=datetime,
+        multichoice=(multi != False),
+        can_view_results=(view_res != False),
+        description_limit=len(desc) + 30
+    )
     voting.save()
     return HttpResponse(str(voting.id))
 
@@ -195,45 +204,51 @@ def voting_unvote_view(req, id:int):
     vote.delete()
     return respond(200, "OK")
 
+
 @check_access(redir=False)
-def voting_edit_view(req, id:int):
+def voting_edit_view(req, id: int):
     voting = Voting.objects.filter(id=id)
-    totalChangedChars = 0 # todo: ограничить максимальное число модификаций
+    totalChangedChars = 0  # todo: ограничить максимальное число модификаций
     if len(voting) <= 0:
         return respond(404, "NOTFOUND")
     voting = voting[0]
-    
+
     if req.user != voting.author:
         return respond(403, "FORBIDDEN")
-    
+
     if voting.closed:
         return respond(423, "CLOSED")
-    
-    name = getPostOr(req, "title", False)
+
     desc = getPostOr(req, "description", False)
     multichoice = getPostOr(req, "multichoice", False)
     view_res = getPostOr(req, "viewresults", False)
 
-    if False in [name, multichoice, view_res]:
+    if False in [multichoice, view_res]:
         return respond(400, "BADREQUEST")
+
     if not checkVars([
-        [str, name, 1, 48],
         [str, desc, 0, 512],
         [["on", "off"], multichoice],
         [["on", "off"], view_res]
     ]):
         return respond(400, "BADREQUEST")
-    voting.name = name
+
+    if voting.description_limit is None:
+        voting.description_limit = len(voting.description) + 30
+
+    if len(desc) > voting.description_limit:
+        return respond(400, "DESCTOOLONG")
+
     voting.description = desc
-    voting.multichoice = multichoice=="on"
-    voting.can_view_results = view_res=="on"
+    voting.multichoice = multichoice == "on"
+    voting.can_view_results = view_res == "on"
 
     raw_options = getPostOr(req, "options", False)
     try:
         options = json.loads(b64dec(raw_options))
         for option in options:
             if not 0 < len(option) <= 48:
-                return respond("BADREQUEST")
+                return respond(400, "BADREQUEST")
     except:
         return respond(400, "BADREQUEST")
 

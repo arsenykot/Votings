@@ -23,14 +23,15 @@
                    type="text"
                    name="title"
                    value="{{ voting.name }}"
-                   required>
+                   readonly>
           </div>
 
           <div class="mb-3">
             <label class="form-label">Description</label>
             <textarea class="form-control"
                       name="description"
-                      rows="3">{{ voting.description }}</textarea>
+                      rows="3"
+                      id="description">{{ voting.description }}</textarea>
           </div>
 
           <div class="form-check mb-3">
@@ -97,9 +98,22 @@ document.getElementById("editform").onsubmit = buildAjaxFormHandler(function(res
       case "CLOSED":
       errorToast(false, "This voting is closed");
       break;
+      case "DESCTOOLONG":
+      errorToast(false, "Description can be extended by at most 30 characters from the original text.");
+      break;
     }
   }
 });
+
+const descTextarea = document.getElementById("description");
+const DESC_LIMIT = {{ desc_limit|default:"null" }};
+
+descTextarea.addEventListener("input", () => {
+    if (descTextarea.value.length > DESC_LIMIT) {
+      descTextarea.value = descTextarea.value.slice(0, DESC_LIMIT);
+    }
+  });
+
 document.getElementById("closeform").onsubmit = buildAjaxFormHandler(function(resp){
   if(resp.status==200) window.location.replace("/votings/view/{{voting.id}}");
   else{
