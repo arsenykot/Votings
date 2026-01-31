@@ -31,7 +31,8 @@
             <textarea class="form-control"
                       name="description"
                       rows="3"
-                      id="description">{{ voting.description }}</textarea>
+                      id="description"
+                      maxLength={{ desc_limit|default:"null" }}>{{ voting.description }}</textarea>
           </div>
 
           <div class="form-check mb-3">
@@ -105,14 +106,6 @@ document.getElementById("editform").onsubmit = buildAjaxFormHandler(function(res
   }
 });
 
-const descTextarea = document.getElementById("description");
-const DESC_LIMIT = {{ desc_limit|default:"null" }};
-
-descTextarea.addEventListener("input", () => {
-    if (descTextarea.value.length > DESC_LIMIT) {
-      descTextarea.value = descTextarea.value.slice(0, DESC_LIMIT);
-    }
-  });
 
 document.getElementById("closeform").onsubmit = buildAjaxFormHandler(function(resp){
   if(resp.status==200) window.location.replace("/votings/view/{{voting.id}}");

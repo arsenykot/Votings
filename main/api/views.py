@@ -234,7 +234,7 @@ def voting_edit_view(req, id: int):
         return respond(400, "BADREQUEST")
 
     if voting.description_limit is None:
-        voting.description_limit = len(voting.description) + 30
+        voting.description_limit = min(len(voting.description) + 30, 512)
 
     if len(desc) > voting.description_limit:
         return respond(400, "DESCTOOLONG")
