@@ -143,11 +143,31 @@
                             {{ author.username }}
                         </a>
                     </p>
+                {%if user.is_staff%}
+                {% if taken_down %}
+                <p>NOTICE: This voting is taken down and only staff members can see its contents</p>
+                {%else%}
+                   <a class="text-danger text-decoration-none mb-0"
+                       href="/api/staff/takedown/{{id}}"
+                       >
+                        <i class="bi bi-ban"></i> Take down
+                    </a>
+                    <br>
+                {%endif%}
+                {% if not author.is_banned%}
+                <a class="text-danger text-decoration-none mb-0"
+                       href="/api/staff/qban/{{author.id}}/{{id}}"
+                       >
+                        <i class="bi bi-ban"></i> Ban author
+                    </a>
+                {%endif%}
+                {%else%}
                     <a class="text-danger text-decoration-none mb-0"
-                       href="/votings/report/{{ id }}"
-                       target="_blank">
+                       href="#"
+                       id="report_button">
                         <i class="bi bi-flag-fill"></i> Report abuse
                     </a>
+                {%endif%}
                 {% else %}
                     <p class="text-secondary-emphasis mb-0">
                         <i class="bi bi-person-fill"></i>
@@ -208,6 +228,14 @@
                 unvoteBtn.disabled = false;
             }
         }, {}, true, [["X-CSRFToken", csrf]]);
+    });
+    report_button.addEventListener("click", function(e){
+        e.preventDefault();
+        ajaxGet("/api/voting/report/{{ id }}", function(resp){
+            if(resp.status == 200) spawnToast("success", "info", "Report sent. Thank you!");
+            else if(resp.status == 404) errorToast(false, "The requested voting was not found");
+            else if(resp.status == 400) errorToast(false, "It seems like you already reported this voting.");
+        });
     });
 </script>
 

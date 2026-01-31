@@ -56,7 +56,7 @@ def existing_voting_view(req, id:int):
     if len(voting) <= 0:
         return render(req, "votings/error/not_found.html", status=404)
     voting = voting[0]
-    if voting.taken_down:
+    if voting.taken_down and not req.user.is_staff:
         return render(req, "votings/error/removed.html", status=403)
     if voting.date_closed:
         closing_time = voting.date_closed.ctime()
@@ -92,7 +92,8 @@ def existing_voting_view(req, id:int):
         "closing_time": closing_time,
         "voted": voted,
         "viewresults": voting.can_view_results,
-        "vote_count": len(voting.votes.all())
+        "vote_count": len(voting.votes.all()),
+        "taken_down": voting.taken_down
     })
 
 def tos_page_view(req):
