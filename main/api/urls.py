@@ -16,5 +16,6 @@ urlpatterns = [
     path('settings/password', settings_password_view),
     path('settings/delete', delete_account),
     path('auth/', include("main.api.auth.urls")),
-    path('registration/', include("main.api.registration.urls"))
+    path('registration/', include("main.api.registration.urls")),
+    path('staff/', include("main.api.staff.urls"))
 ]

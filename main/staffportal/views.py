@@ -3,5 +3,10 @@ from django.shortcuts import redirect
 from django.http import HttpResponse
 from main.models import *
 
-def report_list_view(req):
-    return respond(501, "Not implemented")
+def users_list(req):
+    if not req.user.is_staff:
+        return redirect("/")
+    return render(req, "staff/users.html")
+
+def reports_list(req):
+    return respond(501, "Not yet implemented")

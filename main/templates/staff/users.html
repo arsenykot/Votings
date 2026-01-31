@@ -1,0 +1,151 @@
+{% extends "abc/with_sidebar.html" %}
+{% block title %}Simple Votings Staff{% endblock %}
+
+{% block content %}
+<div class="row">
+    <h1>User management</h1>
+    <form action="/api/staff/users" method="POST" class="row align-items-center w-100" id="searchform" autocomplete="off">
+        {% csrf_token %}
+        <label class="form-control w-25 me-2"><input type="checkbox" name="banned" checked> Show banned</label>
+        <label class="form-control w-25 me-2"><input type="checkbox" name="staff" checked> Show staff</label>
+        <button class="btn btn-primary w-25" type="submit" id="searchbtn">Filter</button>
+    </form>
+    <div id="searchnav" class="w-100">
+        <a href="#" class="badge bg-primary text-decoration-none me-2" style="font-size: large;">1</a>
+        <a href="#" class="badge text-decoration-none me-2" style="font-size: large;">2</a>
+    </div>
+    <div id="searchresults" class="list-group list-group-flush">
+        <i>Loading...</i>
+    </div>
+    <script>
+        searchform.addEventListener("submit", function (e) {
+            e.preventDefault();
+            setSpinner(searchresults, "Loading...");
+        });
+        let buf = [];
+        function pushBadge(elem, badge){
+            let badgeElem = document.createElement("span");
+            badgeElem.classList.add("badge", "ms-2", "bg-"+badge[0]);
+            badgeElem.id = badge[2];
+            badgeElem.innerText = badge[1];
+            elem.appendChild(badgeElem);
+        }
+        function buildBanButtonHandler(elem, id, banned){
+            function f(e){
+                setSpinner(elem, banned?"Unbanning...":"Banning...");
+                ajaxGet("/api/staff/"+(banned?"unban":"ban")+"/"+id, function(resp){
+                    if(resp.status==200){
+                        elem.removeEventListener("click", f);
+                        elem.innerHTML = banned?"<i class='bi bi-ban'></i> Ban":"<i class='bi bi-check'></i> Unban";
+                        let titleElem = elem.parentElement.parentElement.querySelector("h6.mb-1");
+                        if(banned){
+                            titleElem.querySelector("span#banned.badge").remove();
+                        }
+                        else{
+                            pushBadge(titleElem, ["danger", "Banned", "banned"]);
+                        }
+                        spawnToast("success", "info", "Successfully "+(banned?"unbanned":"banned")+ " the specified user");
+                        buildBanButtonHandler(elem, id, !banned);
+                    }
+                    else errorToast(false, "User data modification failed! Are you trying to ban yourself?");
+                });
+            };
+            elem.addEventListener("click", f);
+        }
+        function processResults(page) {
+            setSpinner(searchresults, "Processing...");
+            let nc = document.createElement("div");
+            page -= 1;
+            for (let i = 0; i < 10; i++) {
+            let id = (page * 10) + i;
+            if (id >= 0 && id < buf.length) {
+                let user = buf[id];
+                let uElem = document.createElement("div");
+                uElem.classList.add("list-group-item", "px-0", "d-flex", "w-100", "justify-content-between", "align-items-start");
+                let container = document.createElement("div");
+                container.classList.add("flex-grow-1");
+                let name = document.createElement("h6");
+                let lnk = document.createElement("a");
+                lnk.innerText = user.name;
+                lnk.classList.add("text-decoration-none");
+                lnk.href = "/user/"+user.id;
+                lnk.target = "_blank";
+                name.classList.add("mb-1");
+                name.appendChild(lnk);
+                let badges = [];
+                badges.push(["primary", user.votings+" voting(s)"]);
+                if(user.banned) badges.push(["danger", "Banned", "banned"]);
+                if(user.staff) badges.push(["success", "Staff", "staff"]);
+                badges.forEach(badge=>{
+                    pushBadge(name, badge);
+                });
+                let btns = document.createElement("div");
+                let banButton = document.createElement("button");
+                banButton.classList.add("btn", "btn-danger");
+                banButton.innerHTML = user.banned?"<i class='bi bi-check'></i> Unban":"<i class='bi bi-ban'></i> Ban";
+                buildBanButtonHandler(banButton, user.id, user.banned);
+                console.log(banButton);
+                btns.append(banButton);
+                container.append(name, btns);
+                uElem.appendChild(container);
+                nc.appendChild(uElem);
+            }
+            else break;
+        }
+        Array.from(searchresults.children).forEach(e=>{
+            e.remove();
+        });
+        Array.from(nc.children).forEach(e=>{
+            searchresults.appendChild(e);
+        })
+    }
+    function makenav(text, page, selected){
+        let nav = document.createElement("a");
+        nav.innerText = text;
+        nav.classList.add("badge", "text-decoration-none", "me-2");
+        if(selected) nav.classList.add("bg-primary");
+        nav.style.fontSize = "large";
+        nav.addEventListener("click", function(e){
+            processResults(page);
+            buildSearchNavigator(page);
+        });
+        nav.href="#";
+        return nav;
+    }
+    function buildSearchNavigator(selected_page){
+        let totalpages = Math.ceil(buf.length/10);
+        let sp = (selected_page > 3 ? selected_page - 2 : 1);
+        let ep = Math.min(sp + 5, totalpages);
+        let nav = document.getElementById("searchnav");
+        Array.from(nav.children).forEach(e=>{e.remove()});
+        if(sp != 1){
+            nav.appendChild(makenav("<<", 1, false));
+        }
+        for(let k = sp; k <= ep; k++){
+            nav.appendChild(makenav(k, k, k==selected_page));
+        }
+        if(ep!=totalpages){
+            nav.appendChild(makenav(">>", totalpages, false));
+        }
+    }
+    searchform.addEventListener("submit", buildAjaxFormHandler(function (resp) {
+        if (resp.status == 200) {
+            buf = JSON.parse(resp.content);
+            if(buf.length<=0){
+                searchresults.innerHTML = "<i>Nothing was found</i>";
+                document.getElementById("searchnav").innerHTML = "";
+            }
+            else{
+                processResults(1);
+                buildSearchNavigator(1);
+            }
+        }
+        else if (resp.status == 204) {
+            searchresults.innerHTML = "<i>Nothing was found</i>";
+            document.getElementById("searchnav").innerHTML = "";
+        }
+    }));
+    searchbtn.click();
+</script>
+</div>
+{% endblock %}
